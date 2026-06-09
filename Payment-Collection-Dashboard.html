@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-Infinite Payment Collection Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #2a5c9f 0%, #FF8761 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .nav-tabs {
+            background: white;
+            border-radius: 16px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: #f7fafc;
+            color: #2a5c9f;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #2a5c9f 0%, #FF8761 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            color: #2d3748;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            color: #48bb78;
+        }
+
+        .stat-change.negative {
+            color: #f56565;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h3 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-green {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-yellow {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .badge-orange {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-red {
+            background: #feb2b2;
+            color: #742a2a;
+        }
+
+        .badge-blue {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .filter-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        select, input {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2d3748;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:hover, input:hover {
+            border-color: #cbd5e0;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2a5c9f;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .metric-value {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>💰 N-Infinite Payment Collection Dashboard</h1>
+            <p>Real-time overview of accounts receivable, monthly reports, and brand payment behavior</p>
+        </div>
+
+        <!-- This Week Update Section -->
+        <div class="card" style="background: linear-gradient(135deg, #2a5c9f 0%, #FF8761 100%); color: white; margin-bottom: 30px;">
+            <h2 style="color: white; margin-bottom: 20px;">🆕 Recent Payments (Jun 2-8, 2026)</h2>
+            <div class="stats-grid">
+                <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
+                    <div class="stat-label" style="color: rgba(255,255,255,0.9);">Payments Received</div>
+                    <div class="stat-value" style="color: white;">15</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">Jun 2-8, 2026</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
+                    <div class="stat-label" style="color: rgba(255,255,255,0.9);">Total Cash Collected</div>
+                    <div class="stat-value" style="color: white;">฿390,394</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">Jun 2-8, 2026</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
+                    <div class="stat-label" style="color: rgba(255,255,255,0.9);">Old Invoices (Apr &amp; Earlier)</div>
+                    <div class="stat-value" style="color: white;">฿381,115</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">14 payments (97.6%)</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
+                    <div class="stat-label" style="color: rgba(255,255,255,0.9);">Last Month Invoice (May)</div>
+                    <div class="stat-value" style="color: white;">฿9,279</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">1 payment (2.4%)</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                <h4 style="color: white; margin-bottom: 10px;">💡 Quick Insights:</h4>
+                <ul style="color: rgba(255,255,255,0.9); margin: 0; padding-left: 20px;">
+                    <li>Collected ฿390K in first week of June from 15 payments</li>
+                    <li>Bianca Holdings paid 4 invoices totalling ฿79K</li>
+                    <li>Top payer: Thai Vegan (฿91K), Innovative Food Trucks (฿70K), Bianca Holdings (฿79K combined)</li>
+                    <li>1 prior-month invoice: JR Hospitality ฿31,200 (Feb 2026)</li>
+                </ul>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <button onclick="toggleWeeklyDetails()" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                    📋 View All 15 Payments (Jun 2-8)
+                </button>
+                <div id="weeklyDetailsTable" style="display: none; margin-top: 15px; background: white; border-radius: 8px; padding: 20px;">
+                    <h4 style="color: #2d3748; margin-bottom: 15px;">Payments Received: Jun 2-8, 2026</h4>
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr style="background: #f7fafc; color: #2d3748;">
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Date</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Invoice</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Brand (Thai)</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Contact/Brand</th>
+                                <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e2e8f0;">Amount</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0;">Month</th>
+                            </tr>
+                        </thead>
+                        <tbody id="thisWeekPaymentsBody">
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 6px;">
+                        <strong style="color: #2d3748;">Total: ฿582,215.83 from 16 payments</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('collection')">📋 Invoice Collection Status</button>
+            <button class="nav-tab" onclick="switchTab('weekly')">📈 Weekly Trend</button>
+            <button class="nav-tab" onclick="switchTab('behavior')">🏢 Brand Behavior</button>
+            <button class="nav-tab" onclick="switchTab('outstanding')">📊 Outstanding Payments</button>
+        </div>
+
+
+        <!-- Invoice Collection Status Tab -->
+        <div id="collection-tab" class="tab-content active">
+            
+            <!-- Monthly Cash-in Summary -->
+            <div class="chart-card full-width" style="margin-bottom: 40px;">
+                <h3>💰 Monthly Cash-in Summary (Dec 2025 - Jun 2026)</h3>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">December 2025</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿3,990,344</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">94 payments</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">January 2026</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿3,259,562</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">79 payments</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">February 2026</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿2,844,380</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">72 payments</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">March 2026</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿4,604,046</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">117 payments</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">April 2026</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿3,819,852</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">92 payments</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">May 2026</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿4,587,953</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">114 payments</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 2px solid #e2e8f0;">
+                            <div style="font-size: 13px; color: #64748b; margin-bottom: 5px;">June 2026 <span style="font-size: 11px; color: #f6ad55;">● In Progress</span></div>
+                            <div style="font-size: 22px; font-weight: 700; color: #2a5c9f;">฿390,394</div>
+                            <div style="font-size: 12px; color: #48bb78; margin-top: 3px;">15 payments · Week 1 only</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Type Breakdown Section -->
+            <div style="margin-bottom: 40px;">
+                <h2 style="margin-bottom: 30px;">📊 Collection by Service Type</h2>
+                
+                <!-- Growth & Platform Management Section -->
+                <div style="background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="color: #2a5c9f; margin-bottom: 20px; margin-top: 0;">Growth & Platform Management:</h3>
+                    <table style="background: white;">
+                        <thead>
+                            <tr style="background: #f7fafc;">
+                                <th>Month</th>
+                                <th>Total</th>
+                                <th>Collected</th>
+                                <th>Pending</th>
+                                <th>Collection Rate<br><small>(All)</small></th>
+                                <th>Rate within 45 days<br><small>(from send out)</small></th>
+                                <th>Rate by<br><small>Due Date</small></th>
+                                <th>Total Payment<br>(Cash-in)</th>
+                                <th>Collected Payment<br>(Cash-in)</th>
+                                <th>Pending Payment<br>(Cash-in)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="growthServiceBody">
+                            <tr>
+                                <td><strong>Nov 2025</strong></td>
+                                <td>฿3,074,407</td>
+                                <td style="color: #48bb78;">฿3,051,007</td>
+                                <td style="color: #f56565;">฿23,400</td>
+                                <td><strong style="color: #48bb78">99.2%</strong></td>
+                                <td style="color: #48bb78">86.5%</td>
+                                <td style="color: #f6ad55">71.1%</td>
+                                <td style="background: #c2e4ee;">฿3,200,302</td>
+                                <td style="color: #48bb78; background: #c2e4ee;">฿3,175,657</td>
+                                <td style="color: #f56565; background: #c2e4ee;">฿24,646</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dec 2025</strong></td>
+                                <td>฿3,087,466</td>
+                                <td style="color: #48bb78;">฿3,064,579</td>
+                                <td style="color: #f56565;">฿22,888</td>
+                                <td><strong style="color: #48bb78">99.3%</strong></td>
+                                <td style="color: #48bb78">89.0%</td>
+                                <td style="color: #f6ad55">68.5%</td>
+                                <td style="background: #c2e4ee;">฿3,211,843</td>
+                                <td style="color: #48bb78; background: #c2e4ee;">฿3,187,722</td>
+                                <td style="color: #f56565; background: #c2e4ee;">฿24,120</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jan 2026</strong></td>
+                                <td>฿3,446,407</td>
+                                <td style="color: #48bb78;">฿3,425,262</td>
+                                <td style="color: #f56565;">฿21,145</td>
+                                <td><strong style="color: #48bb78">99.4%</strong></td>
+                                <td style="color: #48bb78">87.8%</td>
+                                <td style="color: #f6ad55">55.2%</td>
+                                <td style="background: #c2e4ee;">฿3,587,864</td>
+                                <td style="color: #48bb78; background: #c2e4ee;">฿3,565,873</td>
+                                <td style="color: #f56565; background: #c2e4ee;">฿21,991</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Feb 2026</strong></td>
+                                <td>฿3,303,688</td>
+                                <td style="color: #48bb78;">฿3,199,039</td>
+                                <td style="color: #f56565;">฿104,649</td>
+                                <td><strong style="color: #48bb78">96.8%</strong></td>
+                                <td style="color: #48bb78">96.2%</td>
+                                <td style="color: #f6ad55">73.5%</td>
+                                <td style="background: #c2e4ee;">฿3,439,401</td>
+                                <td style="color: #48bb78; background: #c2e4ee;">฿3,330,566</td>
+                                <td style="color: #f56565; background: #c2e4ee;">฿108,835</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mar 2026</strong></td>
+                                <td>฿4,243,928</td>
+                                <td style="color: #48bb78;">฿4,099,708</td>
+                                <td style="color: #f56565;">฿144,220</td>
+                                <td><strong style="color: #48bb78">96.6%</strong></td>
+                                <td style="color: #48bb78">96.6%</td>
+                                <td style="color: #48bb78">85.2%</td>
+                                <td style="background: #c2e4ee;">฿4,416,652</td>
+                                <td style="color: #48bb78; background: #c2e4ee;">฿4,272,432</td>
+                                <td style="color: #f56565; background: #c2e4ee;">฿150,210</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Apr 2026</strong></td>
+                                <td>฿3,900,688</td>
+                                <td style="color: #48bb78;">฿1,636,953</td>
+                                <td style="color: #f56565;">฿2,263,735</td>
+                                <td><strong style="color: #f6ad55">42.0%</strong></td>
+                                <td style="color: #f6ad55">42.0%</td>
+                                <td style="color: #f6ad55">42.0%</td>
+                                <td style="background: #c2e4ee;">฿4,058,219</td>
+                                <td style="color: #48bb78; background: #c2e4ee;">฿1,702,512</td>
+                                <td style="color: #f56565; background: #c2e4ee;">฿2,355,707</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Weekly Trend Tab -->
+        <div id="weekly-tab" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Weeks Tracked</div>
+                    <div class="stat-value" id="totalWeeksTracked">26</div>
+                    <div class="stat-change">Dec 2025 - May 2026</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Average Weekly Cash-in</div>
+                    <div class="stat-value" id="avgWeeklyCashin">฿0</div>
+                    <div class="stat-change">Per week average</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Cash-in (Dec-May)</div>
+                    <div class="stat-value" id="totalCashin">฿19,627,159</div>
+                    <div class="stat-change positive">6 months tracked</div>
+                </div>
+            </div>
+
+
+            <div class="chart-card full-width" style="margin-bottom: 20px;">
+                <h3>📈 Weekly Cash-in Trend</h3>
+                <div style="font-size:12px;color:#64748b;margin-bottom:10px;">
+                    Labels show MoM % vs same week of prior month &nbsp;·&nbsp; 🟢 growth &nbsp;·&nbsp; 🔴 decline
+                </div>
+                <canvas id="weeklyTrendChart"></canvas>
+            </div>
+
+            <div class="chart-card full-width" style="margin-bottom: 20px;">
+                <h3>💰 Invoice Send Out Volume</h3>
+                <canvas id="weeklyVolumeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Monthly Report Tab -->
+        <!-- Brand Behavior Tab -->
+        <div id="behavior-tab" class="tab-content">
+
+        <style>
+        .bb-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+        .bb-kpi { background: white; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        .bb-kpi-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+        .bb-kpi-val { font-size: 26px; font-weight: 800; color: #2a5c9f; }
+        .bb-kpi-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
+        .bb-section { background: white; border-radius: 12px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 24px; }
+        .bb-section h3 { font-size: 15px; font-weight: 700; color: #2a5c9f; margin: 0 0 18px 0; }
+        .bb-filters { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+        .bb-filters input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 13px; width: 200px; }
+        .bb-filters select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 13px; background: white; }
+        .bb-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .bb-table th { padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: #94a3b8; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; white-space: nowrap; cursor: pointer; user-select: none; }
+        .bb-table th:hover { color: #2a5c9f; }
+        .bb-table td { padding: 10px 10px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        .bb-table tr:hover td { background: #f8fafc; }
+        .bb-rank { font-size: 11px; font-weight: 700; color: #94a3b8; width: 28px; }
+        .bb-brand-name { font-weight: 600; color: #1e293b; font-size: 13px; }
+        .bb-total { font-weight: 700; color: #2a5c9f; }
+        .bb-days { font-weight: 600; }
+        .bb-mini-bar { display: flex; gap: 2px; align-items: flex-end; height: 28px; }
+        .bb-bar { width: 10px; border-radius: 2px 2px 0 0; background: #93c5fd; transition: background .2s; }
+        .bb-bar:hover { background: #2a5c9f; }
+        .bb-bar.zero { background: #f1f5f9; }
+        .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .badge-fast { background: #dcfce7; color: #166534; }
+        .badge-medium { background: #fef9c3; color: #854d0e; }
+        .badge-slow { background: #fee2e2; color: #991b1b; }
+        .badge-erratic { background: #f3e8ff; color: #6b21a8; }
+        .consistency-bar { height: 6px; border-radius: 3px; background: #e2e8f0; overflow: hidden; width: 70px; }
+        .consistency-fill { height: 100%; border-radius: 3px; }
+        .pred-badge { font-size: 12px; font-weight: 700; color: #0f766e; background: #ccfbf1; padding: 3px 8px; border-radius: 5px; }
+        .sort-arrow { display: inline-block; margin-left: 4px; opacity: .5; }
+        .sort-active { color: #2a5c9f !important; }
+        .sort-active .sort-arrow { opacity: 1; }
+        </style>
+
+        <!-- KPI Row -->
+        <div class="bb-grid">
+            <div class="bb-kpi">
+                <div class="bb-kpi-label">All Brands Total (Net)</div>
+                <div class="bb-kpi-val" id="bb-total">฿0</div>
+                <div class="bb-kpi-sub">Dec 2025 – May 2026</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:6px;line-height:1.5;">
+                    Net cash collected = positive payments minus credit notes (9 RV- entries, -฿13,518)
+                </div>
+            </div>
+            <div class="bb-kpi">
+                <div class="bb-kpi-label">Avg Payment Cycle</div>
+                <div class="bb-kpi-val" id="bb-avg-days">0d</div>
+                <div class="bb-kpi-sub">Avg days invoice → payment</div>
+            </div>
+            <div class="bb-kpi" style="grid-column: span 2;">
+                <div class="bb-kpi-label">Brand Payment Speed Distribution</div>
+                <div style="display:flex; gap: 12px; margin-top: 10px; align-items: center;">
+                    <div style="flex:1; text-align:center; background:#dcfce7; border-radius:8px; padding:10px 6px;">
+                        <div style="font-size:22px; font-weight:800; color:#166534;">42</div>
+                        <div style="font-size:11px; font-weight:700; color:#166534;">FAST</div>
+                        <div style="font-size:11px; color:#166534;">≤30d · 49.4%</div>
+                    </div>
+                    <div style="flex:1; text-align:center; background:#fef9c3; border-radius:8px; padding:10px 6px;">
+                        <div style="font-size:22px; font-weight:800; color:#854d0e;">31</div>
+                        <div style="font-size:11px; font-weight:700; color:#854d0e;">MEDIUM</div>
+                        <div style="font-size:11px; color:#854d0e;">31–45d · 36.5%</div>
+                    </div>
+                    <div style="flex:1; text-align:center; background:#fee2e2; border-radius:8px; padding:10px 6px;">
+                        <div style="font-size:22px; font-weight:800; color:#991b1b;">16</div>
+                        <div style="font-size:11px; font-weight:700; color:#991b1b;">SLOW</div>
+                        <div style="font-size:11px; color:#991b1b;">&gt;45d · 16.2%</div>
+                    </div>
+                </div>
+                <div style="margin-top:10px; height:8px; border-radius:4px; overflow:hidden; display:flex;">
+                    <div style="width:48.0%; background:#22c55e;"></div>
+                    <div style="width:35.7%; background:#f59e0b;"></div>
+                    <div style="width:16.3%; background:#ef4444;"></div>
+                </div>
+                <div class="bb-kpi-sub" style="margin-top:6px;">85 brands total · based on avg payment days</div>
+            </div>
+        </div>
+
+        <!-- Main Table -->
+        <div class="bb-section">
+            <h3>🏆 All Brands — Payment Intelligence</h3>
+            <div class="bb-filters">
+                <input type="text" id="bb-search" placeholder="🔍 Search brand...">
+                <select id="bb-sort">
+                    <option value="total">Sort: Total ↓</option>
+                    <option value="avg_days">Sort: Avg Days</option>
+                    <option value="consistency">Sort: Consistency</option>
+                    <option value="predicted">Sort: June Prediction</option>
+                </select>
+                <select id="bb-speed-filter">
+                    <option value="all">All Payment Speeds</option>
+                    <option value="fast">Fast (≤30d)</option>
+                    <option value="medium">Medium (31-45d)</option>
+                    <option value="slow">Slow (>45d)</option>
+                </select>
+            </div>
+            <div style="overflow-x: auto;">
+            <table class="bb-table" id="bb-main-table">
+                <thead>
+                    <tr>
+                        <th class="bb-rank">#</th>
+                        <th data-col="name">Brand <span class="sort-arrow">↕</span></th>
+                        <th data-col="total">Total Paid <span class="sort-arrow">↕</span></th>
+                        <th>Monthly Trend</th>
+                        <th data-col="avg_days">Avg Days <span class="sort-arrow">↕</span></th>
+                        <th>Pay Cycle</th>
+                        <th data-col="consistency">Consistency <span class="sort-arrow">↕</span></th>
+                        <th data-col="predicted">Expected Jun Payment <span class="sort-arrow">↕</span></th>
+                    </tr>
+                </thead>
+                <tbody id="bb-tbody"></tbody>
+            </table>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- Outstanding Payments Tab -->
+        <div id="outstanding-tab" class="tab-content">
+            <div style="margin-bottom: 20px;">
+                <h2 style="margin: 0 0 10px 0; color: #2a5c9f;">📊 Outstanding Payments Dashboard</h2>
+                <p style="margin: 0; color: #718096; font-size: 14px;">Live data from AR Aging Report - Updated May 25, 2026</p>
+            </div>
+            
+            <!-- Embedded External Dashboard -->
+            <div style="width: 100%; height: calc(100vh - 200px); min-height: 800px; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: white;">
+                <iframe 
+                    src="https://nicknackellah.github.io/-Outstanding-Payments-Dashboard/outstanding_payments_dashboard.html?v=may25" 
+                    style="width: 100%; height: 100%; border: none;"
+                    title="Outstanding Payments Dashboard"
+                    sandbox="allow-scripts allow-same-origin"
+                    loading="lazy">
+                </iframe>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 8px; border-left: 4px solid #2a5c9f;">
+                <p style="margin: 0; color: #4a5568; font-size: 14px;">
+                    <strong>📌 Note:</strong> This dashboard is loaded from an external source and shows real-time outstanding payments data with aging analysis, brand rankings, and detailed breakdowns.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== DATA ==========
+        const brandData = [
+            {"brand":"Kumtsu (Ari)","outstanding":165271.87,"not_due":0,"days_1_30":165271.87,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Pizza Mania (Onnut)","outstanding":128341.11,"not_due":0,"days_1_30":128341.11,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"La Meow (Central Khon Kaen)","outstanding":115630.73,"not_due":0,"days_1_30":115630.73,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Chokdee Dimsum","outstanding":107994.98,"not_due":0,"days_1_30":107994.98,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Le Lapin Sandwich (Onnut)","outstanding":100472.12,"not_due":0,"days_1_30":100472.12,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Ezoya","outstanding":94492.11,"not_due":0,"days_1_30":94492.11,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Eggday (Asok)","outstanding":79471.87,"not_due":0,"days_1_30":79471.87,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Bella Madre Pizza (Bumrungrad)","outstanding":75374.2,"not_due":0,"days_1_30":75374.2,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Hunter Poke","outstanding":66955.76,"not_due":0,"days_1_30":66955.76,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Eggday (Asok) - Branch 2","outstanding":58163.38,"not_due":58163.38,"days_1_30":0,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Kaprao Fury (Ekkamai)","outstanding":44245.05,"not_due":0,"days_1_30":44245.05,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"AGE Burgers","outstanding":42858.15,"not_due":0,"days_1_30":20232.5,"days_31_60":0,"days_61_90":22625.65,"days_91_plus":0},
+            {"brand":"Saigon Sandwich (Empire Tower)","outstanding":40885.53,"not_due":0,"days_1_30":40885.53,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Self Smoothie (Central Eastville)","outstanding":40178.66,"not_due":0,"days_1_30":40178.66,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Sati","outstanding":38289.64,"not_due":0,"days_1_30":38289.64,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"StrackYum (Central Changwattana)","outstanding":36236.73,"not_due":0,"days_1_30":36236.73,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"D'ARK (EmQuartier) FAR","outstanding":36147.36,"not_due":0,"days_1_30":36147.36,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Chubby Dough (BTS Ari) - Branch 1","outstanding":34827.13,"not_due":34827.13,"days_1_30":0,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Bangkok Bob's (Sukhumvit 71)","outstanding":34610.02,"not_due":0,"days_1_30":34610.02,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Chubby Dough (BTS Ari) - Branch 2","outstanding":33160.8,"not_due":0,"days_1_30":33160.8,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Content Marketing Service","outstanding":32100,"not_due":0,"days_1_30":32100,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Fish Fat Bowls (Sutthisan)","outstanding":32753.53,"not_due":0,"days_1_30":32753.53,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"CHUNN (Central Lardprao)","outstanding":28031.74,"not_due":0,"days_1_30":28031.74,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Nadimos Lebanese Restaurant","outstanding":27586.41,"not_due":0,"days_1_30":27586.41,"days_31_60":0,"days_61_90":0,"days_91_plus":0},
+            {"brand":"Grow Tea.studio (Khlong Tan)","outstanding":27181.21,"not_due":0,"days_1_30":13173.57,"days_31_60":0,"days_61_90":0,"days_91_plus":14007.64}
+        ];
+
+        const brandBehavior = [
+            {"contact":"Easy Health (Asoke)","nov_2025":0,"dec_2025":419215,"jan_2026":422311,"feb_2026":450089,"mar_2026":397594,"apr_2026":51353,"grand_total":1740562},
+            {"contact":"Easy Burger (Phrom Phong)","nov_2025":0,"dec_2025":153702,"jan_2026":158708,"feb_2026":151375,"mar_2026":0,"apr_2026":140937,"grand_total":604722},
+            {"contact":"Al Saray","nov_2025":0,"dec_2025":106373,"jan_2026":120833,"feb_2026":109050,"mar_2026":99476,"apr_2026":119607,"grand_total":555339},
+            {"contact":"Saigon Recipe","nov_2025":0,"dec_2025":0,"jan_2026":158425,"feb_2026":91611,"mar_2026":0,"apr_2026":94360,"grand_total":344396},
+            {"contact":"Cholos","nov_2025":0,"dec_2025":0,"jan_2026":76461,"feb_2026":79419,"mar_2026":83215,"apr_2026":81283,"grand_total":320378},
+            {"contact":"Pizza Mania (Onnut)","nov_2025":0,"dec_2025":0,"jan_2026":98027,"feb_2026":109744,"mar_2026":111260,"apr_2026":0,"grand_total":319031},
+            {"contact":"Holey Artisan","nov_2025":0,"dec_2025":76094,"jan_2026":70364,"feb_2026":77566,"mar_2026":0,"apr_2026":79542,"grand_total":303566},
+            {"contact":"Easy Burger (Onnut)","nov_2025":0,"dec_2025":68912,"jan_2026":72546,"feb_2026":75609,"mar_2026":0,"apr_2026":76186,"grand_total":293253},
+            {"contact":"Panetti Pizza","nov_2025":0,"dec_2025":98018,"jan_2026":99935,"feb_2026":93871,"mar_2026":0,"apr_2026":0,"grand_total":291824},
+            {"contact":"La Meow (Central Khon Kaen)","nov_2025":0,"dec_2025":75493,"jan_2026":0,"feb_2026":90673,"mar_2026":108969,"apr_2026":0,"grand_total":275135},
+            {"contact":"Chokdee Dimsum","nov_2025":0,"dec_2025":71848,"jan_2026":94021,"feb_2026":95338,"mar_2026":0,"apr_2026":0,"grand_total":261207},
+            {"contact":"So Vegan (Century Sukhumvit)","nov_2025":0,"dec_2025":82190,"jan_2026":79165,"feb_2026":0,"mar_2026":93414,"apr_2026":0,"grand_total":254769},
+            {"contact":"Mama Pasta & Pizza (HealthBox)","nov_2025":0,"dec_2025":0,"jan_2026":64535,"feb_2026":64274,"mar_2026":70529,"apr_2026":45428,"grand_total":244766},
+            {"contact":"Le Lapin Sandwich (Onnut)","nov_2025":0,"dec_2025":0,"jan_2026":76195,"feb_2026":70125,"mar_2026":79505,"apr_2026":0,"grand_total":225825},
+            {"contact":"Eggday (Asok)","nov_2025":0,"dec_2025":0,"jan_2026":0,"feb_2026":0,"mar_2026":142257,"apr_2026":79471,"grand_total":221728}
+        ];
+
+        const vendorData = [
+            {"vendor_type":"Fast Payer","revenue":11434543.06,"payment":11434543.06,"cash_in":11034690.78,"invoice_count":252},
+            {"vendor_type":"On Time","revenue":4316904.77,"payment":4316904.77,"cash_in":4248866.87,"invoice_count":106},
+            {"vendor_type":"Late payers","revenue":2243110.03,"payment":2243110.03,"cash_in":2168938.55,"invoice_count":63}
+        ];
+
+        // Brand Payment Timing Data (Average days to pay)
+        const brandPaymentTimingData = [
+            {brand: 'Sutunthip Vegan (Charoen Nakhon)', avgDays: 10.0, minDays: 9, maxDays: 11, paymentCount: 2, totalAmount: 96803.00, category: 'fast', team: 'other'},
+            {brand: 'Nine Pastry', avgDays: 10.5, minDays: 9, maxDays: 12, paymentCount: 2, totalAmount: 89427.60, category: 'fast', team: 'other'},
+            {brand: 'Softfood', avgDays: 10.7, minDays: 8, maxDays: 15, paymentCount: 3, totalAmount: 94753.20, category: 'fast', team: 'other'},
+            {brand: 'Mahmoud Shawarma (Sukhumvit 3)', avgDays: 13.0, minDays: 8, maxDays: 20, paymentCount: 5, totalAmount: 277526.70, category: 'fast', team: 'other'},
+            {brand: 'Giglio Trattoria Fiorentina', avgDays: 14.7, minDays: 13, maxDays: 16, paymentCount: 3, totalAmount: 153080.50, category: 'fast', team: 'other'},
+            {brand: 'Apollo Duck', avgDays: 15.0, minDays: 11, maxDays: 17, paymentCount: 3, totalAmount: 137580.10, category: 'fast', team: 'other'},
+            {brand: 'Komugi', avgDays: 15.7, minDays: 6, maxDays: 27, paymentCount: 3, totalAmount: 32042.60, category: 'fast', team: 'other'},
+            {brand: 'Larder', avgDays: 19.6, minDays: 8, maxDays: 41, paymentCount: 5, totalAmount: 218115.90, category: 'fast', team: 'other'},
+            {brand: 'Crackhouse (theCOMMONS Saladaeng)', avgDays: 21.0, minDays: 14, maxDays: 28, paymentCount: 2, totalAmount: 140023.80, category: 'fast', team: 'other'},
+            {brand: 'Easy Burger (Phrom Phong)', avgDays: 22.2, minDays: 9, maxDays: 30, paymentCount: 4, totalAmount: 581463.00, category: 'fast', team: 'other'},
+            {brand: 'Easy Burger (Onnut)', avgDays: 22.2, minDays: 9, maxDays: 30, paymentCount: 4, totalAmount: 281974.00, category: 'fast', team: 'other'},
+            {brand: 'Holey Artisan', avgDays: 23.5, minDays: 22, maxDays: 27, paymentCount: 4, totalAmount: 291890.40, category: 'fast', team: 'other'},
+            {brand: 'Zimt.BKK', avgDays: 25.2, minDays: 20, maxDays: 31, paymentCount: 4, totalAmount: 188719.60, category: 'fast', team: 'other'},
+            {brand: 'So Vegan (Century Sukhumvit)', avgDays: 25.7, minDays: 12, maxDays: 37, paymentCount: 3, totalAmount: 247250.40, category: 'fast', team: 'other'},
+            {brand: 'Saigon Recipe', avgDays: 26.8, minDays: 9, maxDays: 53, paymentCount: 4, totalAmount: 331150.20, category: 'fast', team: 'nicknack'},
+            {brand: 'Jungle Juice (Huai Khwang)', avgDays: 27.5, minDays: 21, maxDays: 34, paymentCount: 2, totalAmount: 109121.80, category: 'fast', team: 'other'},
+            {brand: 'Panetti Pizza', avgDays: 29.3, minDays: 27, maxDays: 31, paymentCount: 3, totalAmount: 280599.50, category: 'fast', team: 'other'},
+            {brand: 'Al Saray', avgDays: 29.8, minDays: 27, maxDays: 31, paymentCount: 5, totalAmount: 532078.90, category: 'fast', team: 'other'},
+            {brand: 'The Protein Box', avgDays: 30.2, minDays: 26, maxDays: 33, paymentCount: 4, totalAmount: 140743.00, category: 'medium', team: 'nicknack'},
+            {brand: 'Nico\'s', avgDays: 30.7, minDays: 27, maxDays: 33, paymentCount: 3, totalAmount: 63852.90, category: 'medium', team: 'nicknack'},
+            {brand: 'Mama Pasta', avgDays: 31.0, minDays: 28, maxDays: 35, paymentCount: 4, totalAmount: 254861.20, category: 'medium', team: 'nicknack'},
+            {brand: 'Nadimos Lebanese Restaurant (Silom)', avgDays: 32.0, minDays: 13, maxDays: 51, paymentCount: 2, totalAmount: 56351.40, category: 'medium', team: 'nicknack'},
+            {brand: 'Kaprao Fury (Ekkamai)', avgDays: 33.0, minDays: 11, maxDays: 55, paymentCount: 2, totalAmount: 94320.70, category: 'medium', team: 'other'},
+            {brand: 'Hunter Poke', avgDays: 34.3, minDays: 12, maxDays: 64, paymentCount: 3, totalAmount: 193911.60, category: 'medium', team: 'other'},
+            {brand: 'Sati', avgDays: 36.0, minDays: 14, maxDays: 58, paymentCount: 2, totalAmount: 99426.20, category: 'medium', team: 'other'},
+            {brand: 'Pizza Mania (Onnut)', avgDays: 37.0, minDays: 8, maxDays: 66, paymentCount: 2, totalAmount: 282634.30, category: 'medium', team: 'other'},
+            {brand: 'Ezoya', avgDays: 38.5, minDays: 17, maxDays: 60, paymentCount: 2, totalAmount: 194063.30, category: 'medium', team: 'other'},
+            {brand: 'Chokdee Dimsum', avgDays: 40.3, minDays: 7, maxDays: 67, paymentCount: 3, totalAmount: 308458.80, category: 'medium', team: 'other'},
+            {brand: 'Le Lapin Sandwich (Onnut)', avgDays: 44.7, minDays: 8, maxDays: 74, paymentCount: 3, totalAmount: 312621.20, category: 'medium', team: 'other'},
+            {brand: 'Kumtsu (Ari)', avgDays: 45.0, minDays: 6, maxDays: 77, paymentCount: 3, totalAmount: 483336.70, category: 'medium', team: 'other'},
+            {brand: 'Menya Itto', avgDays: 46.5, minDays: 25, maxDays: 68, paymentCount: 4, totalAmount: 64832.10, category: 'slow', team: 'nicknack'},
+            {brand: 'Bangkok Bob\'s (Sukhumvit 71)', avgDays: 47.0, minDays: 33, maxDays: 61, paymentCount: 2, totalAmount: 67292.60, category: 'slow', team: 'other'},
+            {brand: 'La Meow (Central Khon Kaen)', avgDays: 48.5, minDays: 44, maxDays: 53, paymentCount: 2, totalAmount: 206449.60, category: 'slow', team: 'other'},
+            {brand: 'Self Smoothie (Central Eastville)', avgDays: 52.8, minDays: 11, maxDays: 81, paymentCount: 4, totalAmount: 118389.50, category: 'slow', team: 'other'},
+            {brand: 'Chubby Dough (BTS Ari)', avgDays: 72.7, minDays: 12, maxDays: 134, paymentCount: 3, totalAmount: 91088.60, category: 'slow', team: 'other'},
+            {brand: 'Eggday (Asok)', avgDays: 78.0, minDays: 43, maxDays: 113, paymentCount: 3, totalAmount: 214161.60, category: 'slow', team: 'other'},
+            {brand: 'AGE Burgers', avgDays: 89.0, minDays: 44, maxDays: 134, paymentCount: 2, totalAmount: 37135.80, category: 'slow', team: 'other'}
+        ];
+
+        const invoiceCollectionData = {
+            "Nov 2025": {
+                total: 3167654.71,
+                paid: 3144254.35,
+                pending: 23400.36,
+                collection_rate: 99.3,
+                pending_rate: 0.7,
+                unpaid_brands: [
+                    {brand: "Grow Tea.studio (Khlong Tan Nuea) ฟรุ้ตส์ ฟูล", amount: 13101.36, invoices: ["IV-20251100039"]},
+                    {brand: "Grow Tea.studio (Sutthisan) ธนพงษ์ พิสิฐสิฬษ์", amount: 10299.0, invoices: ["IV-20251100042"]}
+                ]
+            },
+            "Dec 2025": {
+                total: 3180713.31,
+                paid: 3157825.63,
+                pending: 22887.68,
+                collection_rate: 99.3,
+                pending_rate: 0.7,
+                unpaid_brands: [
+                    {brand: "Grow Tea.studio (Khlong Tan Nuea) ฟรุ้ตส์ ฟูล", amount: 12301.56, invoices: ["IV-20251200036"]},
+                    {brand: "Grow Tea.studio (Sutthisan) ธนพงษ์ พิสิฐสิฬษ์", amount: 10586.12, invoices: ["IV-20251200039"]}
+                ]
+            },
+            "Jan 2026": {
+                total: 3549654.44,
+                paid: 3528508.97,
+                pending: 21145.47,
+                collection_rate: 99.4,
+                pending_rate: 0.6,
+                unpaid_brands: [
+                    {brand: "AGE Burgers", amount: 21145.47, invoices: ["IV-20260100006"]}
+                ]
+            },
+            "Feb 2026": {
+                total: 3363688.31,
+                paid: 3229039.33,
+                pending: 134648.98,
+                collection_rate: 96.0,
+                pending_rate: 4.0,
+                unpaid_brands: [
+                    {brand: "Eggday (Asok)", amount: 54339.61, invoices: ["IV-20260200055"]},
+                    {brand: "Chubby Dough (BTS Ari)", amount: 32547.39, invoices: ["IV-20260200075"]},
+                    {brand: "Content marketing service  FEB 2026 (6/6)", amount: 30000.00, invoices: ["IV-20260200003"]},
+                    {brand: "AGE Burgers", amount: 17761.98, invoices: ["IV-20260200006"]}
+                ]
+            },
+            "Mar 2026": {
+                total: 4252175.03,
+                paid: 4107955.07,
+                pending: 144219.96,
+                collection_rate: 96.6,
+                pending_rate: 3.4,
+                unpaid_brands: [
+                    {brand: "Sati", amount: 35785.13, invoices: ["IV-20260300034"]},
+                    {brand: "StrackYum (Central Changwattana)", amount: 33863.39, invoices: ["IV-20260300024"]},
+                    {brand: "Bangkok Bob's (Sukhumvit 71)", amount: 32336.46, invoices: ["IV-20260300057"]},
+                    {brand: "D'ARK (EmQuartier)", amount: 33781.80, invoices: ["IV-20260300069"]}
+                ]
+            },
+            "Apr 2026": {
+                total: 3908935.50,
+                paid: 1636953.32,
+                pending: 2271982.18,
+                collection_rate: 41.9,
+                pending_rate: 58.1,
+                unpaid_brands: [
+                    {brand: "La Meow (Central Khon Kaen)", amount: 115630.73, invoices: ["IV-20260400063"]},
+                    {brand: "Fit2GO", amount: 95091.55, invoices: ["IV-20260400070"]},
+                    {brand: "Eggday (Asok)", amount: 79471.87, invoices: ["IV-20260400053"]},
+                    {brand: "Bella Madre Pizza (Bumrungrad)", amount: 75374.20, invoices: ["IV-20260400069"]},
+                    {brand: "Hunter Poke", amount: 66955.76, invoices: ["IV-20260400007"]},
+                    {brand: "Eggday (Asok) - Branch 2", amount: 58163.38, invoices: ["IV-20260400054"]},
+                    {brand: "Kaprao Fury (Ekkamai)", amount: 44245.05, invoices: ["IV-20260400067"]},
+                    {brand: "AGE Burgers", amount: 42858.15, invoices: ["IV-20260400006"]},
+                    {brand: "Saigon Sandwich (Empire Tower)", amount: 40885.53, invoices: ["IV-20260400058"]},
+                    {brand: "Self Smoothie (Central Eastville)", amount: 40178.66, invoices: ["IV-20260400011"]}
+                ]
+            }
+        };
+
+        const invoiceCollectionByService = {
+            'growth': {
+                'Nov 2025': {total: 3074407.43, paid: 3051007.07, pending: 23400.36, cashin_total: 3200302, cashin_collected: 3175657, cashin_pending: 24646, collection_rate: 99.2, rate_45days: 86.5, rate_by_due: 71.1, pending_rate: 0.8, unpaid_brands: [{brand: "Grow Tea.studio (Khlong Tan Nuea)", amount: 13101.36, invoices: ["IV-20251100039"]}, {brand: "Grow Tea.studio (Sutthisan)", amount: 10299.0, invoices: ["IV-20251100042"]}]},
+                'Dec 2025': {total: 3087466.19, paid: 3064578.51, pending: 22887.68, cashin_total: 3211843, cashin_collected: 3187722, cashin_pending: 24120, collection_rate: 99.3, rate_45days: 89.0, rate_by_due: 68.5, pending_rate: 0.7, unpaid_brands: [{brand: "Grow Tea.studio (Khlong Tan Nuea)", amount: 12301.56, invoices: ["IV-20251200036"]}, {brand: "Grow Tea.studio (Sutthisan)", amount: 10586.12, invoices: ["IV-20251200039"]}]},
+                'Jan 2026': {total: 3446407.14, paid: 3425261.67, pending: 21145.47, cashin_total: 3587864, cashin_collected: 3565873, cashin_pending: 21991, collection_rate: 99.4, rate_45days: 87.8, rate_by_due: 55.2, pending_rate: 0.6, unpaid_brands: [{brand: "AGE Burgers", amount: 21145.47, invoices: ["IV-20260100006"]}]},
+                'Feb 2026': {total: 3303688.31, paid: 3199039.33, pending: 104648.98, cashin_total: 3439401, cashin_collected: 3330566, cashin_pending: 108835, collection_rate: 96.8, rate_45days: 96.2, rate_by_due: 73.5, pending_rate: 3.2, unpaid_brands: [{brand: "Eggday (Asok)", amount: 54339.61, invoices: ["IV-20260200055"]}, {brand: "Chubby Dough (BTS Ari)", amount: 32547.39, invoices: ["IV-20260200075"]}, {brand: "AGE Burgers", amount: 17761.98, invoices: ["IV-20260200006"]}]},
+                'Mar 2026': {total: 4243927.77, paid: 4099707.81, pending: 144219.96, cashin_total: 4416652, cashin_collected: 4272432, cashin_pending: 150210, collection_rate: 96.6, rate_45days: 96.6, rate_by_due: 85.2, pending_rate: 3.4, unpaid_brands: [{brand: "Sati", amount: 35785.13, invoices: ["IV-20260300034"]}, {brand: "StrackYum", amount: 33863.39, invoices: ["IV-20260300024"]}, {brand: "Bangkok Bob's", amount: 32336.46, invoices: ["IV-20260300057"]}, {brand: "D'ARK", amount: 33781.80, invoices: ["IV-20260300069"]}]},
+                'Apr 2026': {total: 3900688.24, paid: 1636953.32, pending: 2263734.92, cashin_total: 4058219, cashin_collected: 1702512, cashin_pending: 2355707, collection_rate: 42.0, rate_45days: 42.0, rate_by_due: 42.0, pending_rate: 58.0, unpaid_brands: [{brand: "La Meow", amount: 115630.73, invoices: ["IV-20260400063"]}, {brand: "Fit2GO", amount: 95091.55, invoices: ["IV-20260400070"]}, {brand: "Eggday", amount: 79471.87, invoices: ["IV-20260400053"]}, {brand: "Bella Madre", amount: 75374.20, invoices: ["IV-20260400069"]}, {brand: "Hunter Poke", amount: 66955.76, invoices: ["IV-20260400007"]}]}
+            },
+            'other': {
+                'Nov 2025': {total: 93247.29, paid: 93247.29, pending: 0, cashin_total: 96977, cashin_collected: 96977, cashin_pending: 0, collection_rate: 100.0, rate_45days: 100.0, rate_by_due: 73.2, pending_rate: 0.0, unpaid_brands: []},
+                'Dec 2025': {total: 93247.12, paid: 93247.12, pending: 0, cashin_total: 96977, cashin_collected: 96977, cashin_pending: 0, collection_rate: 100.0, rate_45days: 8.8, rate_by_due: 41.0, pending_rate: 0.0, unpaid_brands: []},
+                'Jan 2026': {total: 103247.29, paid: 103247.29, pending: 0, cashin_total: 107377, cashin_collected: 107377, cashin_pending: 0, collection_rate: 100.0, rate_45days: 100.0, rate_by_due: 100.0, pending_rate: 0.0, unpaid_brands: []},
+                'Feb 2026': {total: 60000.0, paid: 30000.0, pending: 30000.0, cashin_total: 62400, cashin_collected: 31200, cashin_pending: 31200, collection_rate: 50.0, rate_45days: 50.0, rate_by_due: 50.0, pending_rate: 50.0, unpaid_brands: [{brand: "Content marketing service FEB 2026", amount: 30000.0, invoices: ["IV-20260200003"]}]},
+                'Mar 2026': {total: 8247.26, paid: 8247.26, pending: 0, cashin_total: 8577, cashin_collected: 8577, cashin_pending: 0, collection_rate: 100.0, rate_45days: 100.0, rate_by_due: 100.0, pending_rate: 0.0, unpaid_brands: []},
+                'Apr 2026': {total: 8247.26, paid: 0, pending: 8247.26, cashin_total: 8577, cashin_collected: 0, cashin_pending: 8577, collection_rate: 0.0, rate_45days: 0.0, rate_by_due: 0.0, pending_rate: 100.0, unpaid_brands: [{brand: "Content marketing service APR 2026", amount: 8247.26, invoices: ["IV-20260400001"]}]}
+            }
+        };
+
+        const collectionRatesDetailed = {
+            'Nov 2025': {rate_all: 99.3, rate_45days: 86.9, rate_by_due: 71.2},
+            'Dec 2025': {rate_all: 99.3, rate_45days: 0.0, rate_by_due: 35.9},
+            'Jan 2026': {rate_all: 99.4, rate_45days: 87.3, rate_by_due: 55.4},
+            'Feb 2026': {rate_all: 97.0, rate_45days: 95.4, rate_by_due: 73.5},
+            'Mar 2026': {rate_all: 96.6, rate_45days: 96.6, rate_by_due: 85.2},
+            'Apr 2026': {rate_all: 41.9, rate_45days: 41.9, rate_by_due: 41.9}
+        };
+
+        const weeklyTrendData = [
+            {week: 'Week 48 (24 - 30 Nov)', invoiced: 90950, collected: 90950, pending: 0, cashin: 609899, collection_rate: 100.0, invoice_count: 0, paid_count: 3},
+            {week: 'Week 49 (1 - 7 Dec)', invoiced: 0, collected: 0, pending: 0, cashin: 679338, collection_rate: 0, invoice_count: 85, paid_count: 0},
+            {week: 'Week 50 (8 - 14 Dec)', invoiced: 0, collected: 0, pending: 0, cashin: 666851, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 51 (15 - 21 Dec)', invoiced: 0, collected: 0, pending: 0, cashin: 1460957, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 52 (22 - 28 Dec)', invoiced: 3312413, collected: 3287923, pending: 24490, cashin: 573299, collection_rate: 99.3, invoice_count: 0, paid_count: 78},
+            {week: 'Week 1 (29 Dec - 4 Jan)', invoiced: 90950, collected: 58850, pending: 32100, cashin: 357043, collection_rate: 64.7, invoice_count: 0, paid_count: 2},
+            {week: 'Week 2 (5 - 11 Jan)', invoiced: 0, collected: 0, pending: 0, cashin: 1163519, collection_rate: 0, invoice_count: 81, paid_count: 0},
+            {week: 'Week 3 (12 - 18 Jan)', invoiced: 10700, collected: 10700, pending: 0, cashin: 539275, collection_rate: 100.0, invoice_count: 1, paid_count: 1},
+            {week: 'Week 4 (19 - 25 Jan)', invoiced: 0, collected: 0, pending: 0, cashin: 1199724, collection_rate: 0, invoice_count: 1, paid_count: 0},
+            {week: 'Week 5 (26 Jan - 1 Feb)', invoiced: 64200, collected: 32100, pending: 32100, cashin: 161679, collection_rate: 50.0, invoice_count: 0, paid_count: 1},
+            {week: 'Week 6 (2 - 8 Feb)', invoiced: 0, collected: 0, pending: 0, cashin: 569121, collection_rate: 0, invoice_count: 74, paid_count: 0},
+            {week: 'Week 7 (9 - 15 Feb)', invoiced: 0, collected: 0, pending: 0, cashin: 1119092, collection_rate: 0, invoice_count: 10, paid_count: 0},
+            {week: 'Week 8 (16 - 22 Feb)', invoiced: 3534946, collected: 3421691, pending: 113256, cashin: 1035466, collection_rate: 96.8, invoice_count: 6, paid_count: 82},
+            {week: 'Week 9 (23 Feb - 1 Mar)', invoiced: 8825, collected: 8825, pending: 0, cashin: 357722, collection_rate: 100.0, invoice_count: 0, paid_count: 1},
+            {week: 'Week 10 (2 - 8 Mar)', invoiced: 0, collected: 0, pending: 0, cashin: 1095208, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 11 (9 - 15 Mar)', invoiced: 0, collected: 0, pending: 0, cashin: 1384964, collection_rate: 0, invoice_count: 88, paid_count: 0},
+            {week: 'Week 12 (16 - 22 Mar)', invoiced: 0, collected: 0, pending: 0, cashin: 1210128, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 13 (23 - 29 Mar)', invoiced: 4541003, collected: 3093580, pending: 1447423, cashin: 593054, collection_rate: 68.1, invoice_count: 0, paid_count: 65},
+            {week: 'Week 14 (30 Mar - 5 Apr)', invoiced: 0, collected: 0, pending: 0, cashin: 1007481, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 15 (6 - 12 Apr)', invoiced: 0, collected: 0, pending: 0, cashin: 457582, collection_rate: 0, invoice_count: 99, paid_count: 0},
+            {week: 'Week 16 (13 - 19 Apr)', invoiced: 0, collected: 0, pending: 0, cashin: 946670, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 17 (20 - 26 Apr)', invoiced: 0, collected: 0, pending: 0, cashin: 1330113, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 18 (27 Apr - 3 May)', invoiced: 0, collected: 0, pending: 0, cashin: 1104690, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 19 (4 - 10 May)', invoiced: 0, collected: 0, pending: 0, cashin: 582216, collection_rate: 0, invoice_count: 100, paid_count: 0},
+            {week: 'Week 20 (11 - 17 May)', invoiced: 0, collected: 0, pending: 0, cashin: 582216, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 21 (18 - 24 May)', invoiced: 0, collected: 0, pending: 0, cashin: 1174151, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 22 (25 - 31 May)', invoiced: 0, collected: 0, pending: 0, cashin: 1736896, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 23 (2 - 8 Jun)', invoiced: 0, collected: 0, pending: 0, cashin: 390394, collection_rate: 0, invoice_count: 0, paid_count: 0}
+        ];
+
+        const monthlyCashIn = {
+            'Dec 2025': 3990344.33,
+            'Jan 2026': 3259561.56,
+            'Feb 2026': 2844380.41,
+            'Mar 2026': 4604046.00,
+            'Apr 2026': 3819851.99,
+            'May 2026': 3223435.11
+        };
+
+        const thisWeekPayments = [
+            {date: '05/06/2026', ref: 'IV-20260400043', contact: 'ไทยวีแกน Company Limited', amount: 91245.98, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400008', contact: 'อินโนเวทีฟ ฟู๊ด ทรัคส์ Company Limited', amount: 70475.81, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400019', contact: 'บิอันก้า โฮลดิ้งส์ Company Limited', amount: 38574.80, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400028', contact: 'สะแตกยำ กรุ๊ป Company Limited', amount: 33842.73, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260200003', contact: 'เจ อาร์ ฮอสพิทอลลิตี้ Company Limited', amount: 31200.00, month: 'Feb 2026'},
+            {date: '02/06/2026', ref: 'IV-20240400007', contact: 'ซิบบาไรต์ Company Limited', amount: 20391.28, month: 'Apr 2026'},
+            {date: '02/06/2026', ref: 'IV-20260400034', contact: 'อราเบสค์ Company Limited', amount: 19790.03, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400062', contact: 'บิอันก้า โฮลดิ้งส์ Company Limited', amount: 16977.34, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400040', contact: 'โฮลี่ เบลลี่ อีเอ็มเอส Company Limited', amount: 14439.53, month: 'Apr 2026'},
+            {date: '02/06/2026', ref: 'IV-20260400056', contact: 'เอชเอสเอ็ม มอร์แกน เทรดดิ้ง Company Limited', amount: 12371.04, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400013', contact: 'บิอันก้า โฮลดิ้งส์ Company Limited', amount: 11940.96, month: 'Apr 2026'},
+            {date: '05/06/2026', ref: 'IV-20260400063', contact: 'บิอันก้า โฮลดิ้งส์ Company Limited', amount: 11543.76, month: 'Apr 2026'},
+            {date: '06/06/2026', ref: 'IV-20260500020', contact: 'ดี-เวอร์ค สไตล์ Company Limited', amount: 9278.92, month: 'May 2026'},
+            {date: '06/06/2026', ref: 'IV-20260400091', contact: 'ลาร์เดอร์ ทู Company Limited', amount: 7964.60, month: 'Apr 2026'},
+            {date: '02/06/2026', ref: 'RV-202606002', contact: 'เอชเอสเอ็ม มอร์แกน เทรดดิ้ง Company Limited', amount: 356.86, month: 'Other'}
+        ];
+        
+        // Invoice to Brand mapping from CSV
+        const invoiceToBrand = {
+            // Jun 2-8 payments (Week 23)
+            'IV-20260400043': 'Thai Vegan',
+            'IV-20260400008': 'Innovative Food Trucks',
+            'IV-20260400019': 'Bianca Holdings',
+            'IV-20260400028': 'StrackYum Group',
+            'IV-20260200003': 'JR Hospitality',
+            'IV-20240400007': 'Sybarite',
+            'IV-20260400034': 'Arabesque',
+            'IV-20260400062': 'Bianca Holdings',
+            'IV-20260400040': 'Holy Belly EMS',
+            'IV-20260400056': 'HSM Morgan Trading',
+            'IV-20260400013': 'Bianca Holdings',
+            'IV-20260400063': 'Bianca Holdings',
+            'IV-20260500020': 'D-Work Style',
+            'IV-20260400091': 'Larder 2',
+            'RV-202606002': 'Credit Note'
+        };
+
+        // AR Aging Statistics (As at May 11, 2026)
+        const arAgingStats = {
+            totalOutstanding: 5232581.12,
+            notDue: 3437087.22,
+            overdue_1_30: 144074.41,
+            overdue_90_plus: 1517877.72,
+            totalBrands: 113
+        };
+
+        // Outstanding Payments Data from AR Aging (Top 50 brands)
+        const outstandingPaymentsData = [
+            {brand: 'Easy Helth', months: ["Apr'26"], invoices: ["IV-20260400017"], amount: 413576.81, aging: 'current'},
+            {brand: 'La Meow (Central Khon Kaen)', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300061", "IV-20260400061"], amount: 206449.55, aging: '360+'},
+            {brand: 'Breakfast Story (Asok)', months: ["Apr'26"], invoices: ["IV-20260400075"], amount: 190440.74, aging: 'current'},
+            {brand: 'Fit2GO', months: ["Apr'26"], invoices: ["IV-20260400070"], amount: 171550.9, aging: 'current'},
+            {brand: 'Kumtsu (Ari)', months: ["Apr'26"], invoices: ["IV-20260400079"], amount: 163371.02, aging: 'current'},
+            {brand: 'Easy Burger (Phrom Phong)', months: ["Apr'26"], invoices: ["IV-20260400009"], amount: 144242.0, aging: 'current'},
+            {brand: 'Eggday (Asok)', months: ["Feb'26", "Mar'26"], invoices: ["IV-20260200055", "IV-20260300052"], amount: 137635.25, aging: '360+'},
+            {brand: 'Hunter Poke', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300007", "IV-20260400011"], amount: 130781.1, aging: '360+'},
+            {brand: 'Pizza Mania (Onnut)', months: ["Apr'26"], invoices: ["IV-20260400052"], amount: 124590.91, aging: 'current'},
+            {brand: 'Al Saray', months: ["Apr'26"], invoices: ["IV-20260400002"], amount: 109787.14, aging: 'current'},
+            {brand: 'Five Dollar Philly Cheese Steaks (On Nut)', months: ["Jun'25", "Jul'25", "Aug'25"], invoices: ["IV-20250600045", "IV-20250700049", "IV-20250800044"], amount: 107652.14, aging: '360+'},
+            {brand: 'Le Lapin Sandwich (Onnut)', months: ["Apr'26"], invoices: ["IV-20260400051"], amount: 102385.94, aging: 'current'},
+            {brand: 'So Vegan (Century Sukhumvit)', months: ["Apr'26"], invoices: ["IV-20260400043"], amount: 93878.08, aging: 'current'},
+            {brand: 'Chokdee Dimsum', months: ["Apr'26"], invoices: ["IV-20260400042"], amount: 92876.07, aging: 'current'},
+            {brand: 'Panetti Pizza', months: ["Apr'26"], invoices: ["IV-20260400024"], amount: 86391.86, aging: 'current'},
+            {brand: 'Saigon Recipe', months: ["Apr'26"], invoices: ["IV-20260400012"], amount: 81760.03, aging: 'current'},
+            {brand: 'Ezoya', months: ["Apr'26"], invoices: ["IV-20260400030"], amount: 80745.25, aging: 'current'},
+            {brand: 'Bella Madre Pizza (Bumrungrad Road)', months: ["Mar'26"], invoices: ["IV-20260300068"], amount: 75374.2, aging: '360+'},
+            {brand: 'Cholos', months: ["Apr'26"], invoices: ["IV-20260400008"], amount: 72508.77, aging: 'current'},
+            {brand: 'Holey Artisan', months: ["Apr'26"], invoices: ["IV-20260400022"], amount: 72157.88, aging: 'current'},
+            {brand: 'Self Smoothie (Central Eastville)', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300010", "IV-20260400014"], amount: 71396.06, aging: '360+'},
+            {brand: 'StrackYum (Central Changwattana)', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300024", "IV-20260400028"], amount: 71055.69, aging: '360+'},
+            {brand: 'Easy Burger (Onnut)', months: ["Apr'26"], invoices: ["IV-20260400010"], amount: 70659.35, aging: 'current'},
+            {brand: 'Jungle Juice (Huai Khwang)', months: ["Apr'26"], invoices: ["IV-20260400078"], amount: 68809.78, aging: 'current'},
+            {brand: 'Chubby Dough (BTS Ari)', months: ["Feb'26", "Mar'26"], invoices: ["IV-20260200075", "IV-20260300072"], amount: 67987.93, aging: '360+'},
+            {brand: 'Bangkok Bob\'s (Sukhumvit 71)', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300057", "IV-20260400057"], amount: 67292.62, aging: '360+'},
+            {brand: 'Sati', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300034", "IV-20260400037"], amount: 65793.66, aging: '360+'},
+            {brand: 'AGE Burgers', months: ["Jan'26", "Feb'26", "Mar'26"], invoices: ["IV-20260100006", "IV-20260200006", "IV-20260300005"], amount: 61842.05, aging: '360+'},
+            {brand: 'Bella Madre Pizza (Bumrungrad Road)', months: ["Apr'26"], invoices: ["IV-20260400068"], amount: 60328.5, aging: 'current'},
+            {brand: 'El Mercado', months: ["Apr'24", "May'24", "Jun'24"], invoices: ["IV-20240400007", "IV-20240500007", "IV-20240600006"], amount: 58124.54, aging: '360+'},
+            {brand: 'Crackhouse (theCOMMONS Saladaeng)', months: ["Apr'26"], invoices: ["IV-20260400085"], amount: 57293.97, aging: 'current'},
+            {brand: 'Nadimos Lebanese Restaurant (Silom)', months: ["Mar'26", "Apr'26"], invoices: ["IV-20260300058", "IV-20260400058"], amount: 57270.81, aging: '360+'},
+            {brand: 'Kaprao Fury (Ekkamai)', months: ["Apr'26"], invoices: ["IV-20260400067"], amount: 57117.53, aging: 'current'},
+            {brand: 'Giglio Trattoria Fiorentina', months: ["Apr'26"], invoices: ["IV-20260400020"], amount: 55635.35, aging: 'current'},
+            {brand: 'Grow Tea.studio (Sutthisan)', months: ["Sep'25", "Oct'25", "Nov'25", "Dec'25"], invoices: ["IV-20250900041", "IV-20251000040", "IV-20251100042", "IV-20251200039"], amount: 51490.5, aging: '360+'},
+            {brand: 'Oppa Daek (Ayutthaya City Park)', months: ["Apr'26"], invoices: ["IV-20260400086"], amount: 50601.21, aging: 'current'},
+            {brand: 'The Protein Box', months: ["Apr'26"], invoices: ["IV-20260400005"], amount: 49829.15, aging: 'current'},
+            {brand: 'Apollo Duck', months: ["Apr'26"], invoices: ["IV-20260400036"], amount: 49609.2, aging: 'current'},
+            {brand: 'Zimt.BKK', months: ["Apr'26"], invoices: ["IV-20260400016"], amount: 47943.38, aging: 'current'},
+            {brand: 'Kaprao Fury (Ekkamai)', months: ["Mar'26"], invoices: ["IV-20260300067"], amount: 44245.05, aging: '360+'},
+            {brand: 'Grow Tea.studio (Khlong Tan Nuea)', months: ["Oct'25", "Nov'25", "Dec'25"], invoices: ["IV-20251000037", "IV-20251100039", "IV-20251200036"], amount: 43270.37, aging: '360+'},
+            {brand: 'Nine Pastry', months: ["Apr'26"], invoices: ["IV-20260400038"], amount: 41891.05, aging: 'current'},
+            {brand: 'Ruen Petch Suki', months: ["Apr'26"], invoices: ["IV-20260400027"], amount: 41490.96, aging: 'current'},
+            {brand: 'Saigon Sandwich (Empire Tower)', months: ["Apr'26"], invoices: ["IV-20260400072"], amount: 40966.2, aging: 'current'},
+            {brand: 'Onnie\'s Recipe (Central Rama 9)', months: ["Apr'26"], invoices: ["IV-20260400060"], amount: 40686.97, aging: 'current'},
+            {brand: 'BIANCA Italian Restaurant (Emsphere)', months: ["Apr'26"], invoices: ["IV-20260400019"], amount: 39687.53, aging: 'current'},
+            {brand: 'Softfood', months: ["Apr'26"], invoices: ["IV-20260400039"], amount: 39424.88, aging: 'current'},
+            {brand: 'Tonkatsu Koseki Bekkaku', months: ["Apr'26"], invoices: ["IV-20260400031"], amount: 36461.61, aging: 'current'},
+            {brand: 'Nanohana (Ari)', months: ["Apr'26"], invoices: ["IV-20260400066"], amount: 35966.11, aging: 'current'},
+            {brand: 'Crunch', months: ["Apr'26"], invoices: ["IV-20260400099"], amount: 35909.79, aging: 'current'}
+        ];
+
+        // Total outstanding summary
+        const outstandingTotalAmount = arAgingStats.totalOutstanding;
+        const outstandingTotalBrands = arAgingStats.totalBrands;
+
+        let currentServiceFilter = 'all';
+
+        let charts = {};
+
+        // ========== THIS WEEK UPDATE FUNCTIONS ==========
+        function toggleWeeklyDetails() {
+            const detailsDiv = document.getElementById('weeklyDetailsTable');
+            if (detailsDiv.style.display === 'none') {
+                detailsDiv.style.display = 'block';
+                populateThisWeekPayments();
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+        }
+
+        function populateThisWeekPayments() {
+            const tbody = document.getElementById('thisWeekPaymentsBody');
+            if (!tbody) {
+                console.error('thisWeekPaymentsBody not found');
+                return;
+            }
+            
+            // Only skip if already populated with actual data (more than just whitespace)
+            if (tbody.innerHTML.trim() !== '' && tbody.querySelectorAll('tr').length > 0) {
+                return; // Already populated
+            }
+            
+            console.log('Populating', thisWeekPayments.length, 'payments');
+            
+            tbody.innerHTML = thisWeekPayments.map(p => {
+                let monthBadge = '';
+                if (p.month === 'Mar 2026') monthBadge = '<span class="badge badge-blue">Mar</span>';
+                else if (p.month === 'Apr 2026') monthBadge = '<span class="badge badge-green">Apr</span>';
+                else monthBadge = '<span class="badge badge-yellow">Other</span>';
+                
+                // Get English brand name from mapping
+                const englishBrand = invoiceToBrand[p.ref] || 'N/A';
+                
+                return `<tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px; color: #4a5568;">${p.date}</td>
+                    <td style="padding: 12px; color: #4a5568; font-family: monospace; font-size: 12px;">${p.ref}</td>
+                    <td style="padding: 12px; color: #2d3748;">${p.contact}</td>
+                    <td style="padding: 12px; color: #2a5c9f; font-weight: 500;">${englishBrand}</td>
+                    <td style="padding: 12px; text-align: right; color: #48bb78; font-weight: bold;">${formatCurrency(p.amount)}</td>
+                    <td style="padding: 12px; text-align: center;">${monthBadge}</td>
+                </tr>`;
+            }).join('');
+            
+            console.log('Populated', tbody.querySelectorAll('tr').length, 'rows');
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function formatCurrency(num) {
+            if (!num) return '฿0';
+            return '฿' + num.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        }
+
+        // Null-safe DOM helpers — prevent TypeError on removed elements
+        function safeSet(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+        function safeChart(id, config) {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            try { return new Chart(el, config); } catch(e) { return null; }
+        }
+
+        function getStatusBadge(brand) {
+            if (brand.days_91_plus > 0) return '<span class="badge badge-red">Critical</span>';
+            if (brand.days_61_90 > 0) return '<span class="badge badge-orange">High Risk</span>';
+            if (brand.days_31_60 > 0) return '<span class="badge badge-yellow">Moderate</span>';
+            if (brand.days_1_30 > 0) return '<span class="badge badge-yellow">Overdue</span>';
+            return '<span class="badge badge-green">Current</span>';
+        }
+
+        function getBehaviorStatus(brand) {
+            const total = brand.grand_total;
+            if (total > 500000) return '<span class="badge badge-green">Top Tier</span>';
+            if (total > 200000) return '<span class="badge badge-blue">High Value</span>';
+            if (total > 50000) return '<span class="badge badge-yellow">Standard</span>';
+            return '<span class="badge badge-orange">Low Activity</span>';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'collection' && !charts.monthlyCollectionChart) {
+                setTimeout(initCollectionTab, 100);
+            }
+            if (tabName === 'weekly' && !charts.weeklyTrendChart) {
+                setTimeout(initWeeklyTab, 100);
+            }
+            if (tabName === 'monthly' && !charts.vendorTypeChart) {
+                setTimeout(initMonthlyTab, 100);
+            }
+            if (tabName === 'behavior' && !charts.brandTrendChart) {
+                setTimeout(initBehaviorTab, 100);
+            }
+        }
+
+        // ========== OUTSTANDING PAYMENTS TAB ==========
+        function initOutstandingTab() {
+            const totals = brandData.reduce((acc, brand) => {
+                acc.outstanding += brand.outstanding;
+                acc.not_due += brand.not_due;
+                acc.days_1_30 += brand.days_1_30;
+                acc.days_31_60 += brand.days_31_60;
+                acc.days_61_90 += brand.days_61_90;
+                acc.days_91_plus += brand.days_91_plus;
+                return acc;
+            }, {outstanding: 0, not_due: 0, days_1_30: 0, days_31_60: 0, days_61_90: 0, days_91_plus: 0});
+
+            document.getElementById('totalOutstanding').textContent = formatCurrency(totals.outstanding);
+            document.getElementById('notDue').textContent = formatCurrency(totals.not_due);
+            document.getElementById('days1_30').textContent = formatCurrency(totals.days_1_30);
+            document.getElementById('days90Plus').textContent = formatCurrency(totals.days_91_plus);
+
+            // Sort all brands by urgency (most overdue first)
+            const sortedBrands = [...brandData].sort((a, b) => {
+                // Calculate urgency score: 90+ days = highest priority
+                const urgencyA = (a.days_91_plus * 4) + (a.days_61_90 * 3) + (a.days_31_60 * 2) + (a.days_1_30 * 1);
+                const urgencyB = (b.days_91_plus * 4) + (b.days_61_90 * 3) + (b.days_31_60 * 2) + (b.days_1_30 * 1);
+                return urgencyB - urgencyA; // Most urgent first
+            });
+
+            // Color code based on urgency
+            const brandColors = sortedBrands.map(b => {
+                if (b.days_91_plus > 0) return 'rgba(159, 18, 57, 0.8)'; // Dark red - critical
+                if (b.days_61_90 > 0) return 'rgba(245, 101, 101, 0.8)'; // Red - high risk
+                if (b.days_31_60 > 0) return 'rgba(246, 173, 85, 0.8)'; // Orange - moderate
+                if (b.days_1_30 > 0) return 'rgba(251, 211, 141, 0.8)'; // Yellow - overdue
+                return 'rgba(72, 187, 120, 0.8)'; // Green - current
+            });
+
+            charts.topBrandsChart = safeChart('topBrandsChart', {
+                type: 'bar',
+                data: {
+                    labels: sortedBrands.map(b => b.brand),
+                    datasets: [{
+                        label: 'Outstanding Amount',
+                        data: sortedBrands.map(b => b.outstanding),
+                        backgroundColor: brandColors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const brand = sortedBrands[context.dataIndex];
+                                    let status = '';
+                                    if (brand.days_91_plus > 0) status = ' (90+ days overdue - CRITICAL)';
+                                    else if (brand.days_61_90 > 0) status = ' (61-90 days overdue)';
+                                    else if (brand.days_31_60 > 0) status = ' (31-60 days overdue)';
+                                    else if (brand.days_1_30 > 0) status = ' (1-30 days overdue)';
+                                    else status = ' (Current)';
+                                    return formatCurrency(context.parsed.x) + status;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                callback: (value) => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+
+            charts.agingChart = safeChart('agingChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Not Due', '1-30 Days', '31-60 Days', '61-90 Days', '90+ Days'],
+                    datasets: [{
+                        data: [totals.not_due, totals.days_1_30, totals.days_31_60, totals.days_61_90, totals.days_91_plus],
+                        backgroundColor: [
+                            'rgba(72, 187, 120, 0.8)',
+                            'rgba(251, 211, 141, 0.8)',
+                            'rgba(246, 173, 85, 0.8)',
+                            'rgba(245, 101, 101, 0.8)',
+                            'rgba(159, 18, 57, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.label + ': ' + formatCurrency(context.parsed)
+                            }
+                        }
+                    }
+                }
+            });
+
+            const agingLabels = brandData.slice(0, 15).map(b => b.brand);
+            charts.agingBreakdownChart = safeChart('agingBreakdownChart', {
+                type: 'bar',
+                data: {
+                    labels: agingLabels,
+                    datasets: [
+                        {
+                            label: 'Not Due',
+                            data: brandData.slice(0, 15).map(b => b.not_due),
+                            backgroundColor: 'rgba(72, 187, 120, 0.8)'
+                        },
+                        {
+                            label: '1-30 Days',
+                            data: brandData.slice(0, 15).map(b => b.days_1_30),
+                            backgroundColor: 'rgba(251, 211, 141, 0.8)'
+                        },
+                        {
+                            label: '31-60 Days',
+                            data: brandData.slice(0, 15).map(b => b.days_31_60),
+                            backgroundColor: 'rgba(246, 173, 85, 0.8)'
+                        },
+                        {
+                            label: '61-90 Days',
+                            data: brandData.slice(0, 15).map(b => b.days_61_90),
+                            backgroundColor: 'rgba(245, 101, 101, 0.8)'
+                        },
+                        {
+                            label: '90+ Days',
+                            data: brandData.slice(0, 15).map(b => b.days_91_plus),
+                            backgroundColor: 'rgba(159, 18, 57, 0.8)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { stacked: true },
+                        y: { 
+                            stacked: true,
+                            ticks: {
+                                callback: (value) => formatCurrency(value)
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.dataset.label + ': ' + formatCurrency(context.parsed.y)
+                            }
+                        }
+                    }
+                }
+            });
+
+            renderBrandTable(brandData);
+        }
+
+        function renderBrandTable(data) {
+            const tbody = document.getElementById('brandTableBody');
+            tbody.innerHTML = data.map(brand => `
+                <tr>
+                    <td><strong>${brand.brand}</strong></td>
+                    <td><strong>${formatCurrency(brand.outstanding)}</strong></td>
+                    <td>${formatCurrency(brand.not_due)}</td>
+                    <td>${formatCurrency(brand.days_1_30)}</td>
+                    <td>${formatCurrency(brand.days_31_60)}</td>
+                    <td>${formatCurrency(brand.days_61_90)}</td>
+                    <td>${formatCurrency(brand.days_91_plus)}</td>
+                    <td>${getStatusBadge(brand)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ========== WEEKLY TREND TAB ==========
+        function initWeeklyTab() {
+            // Calculate stats
+            const totalWeeks = weeklyTrendData.length;
+            const totalCashin = weeklyTrendData.reduce((sum, w) => sum + w.cashin, 0);
+            const avgCashin = totalCashin / totalWeeks;
+
+            document.getElementById('totalWeeksTracked').textContent = totalWeeks;
+            document.getElementById('avgWeeklyCashin').textContent = formatCurrency(avgCashin);
+            document.getElementById('totalCashin').textContent = formatCurrency(totalCashin);
+
+            // Weekly Trend Chart (Cash-in)
+            // MoM pairs: week label -> {prevWeek, prevCashin, growth}
+            const weekMoM = {
+                'Week 52 (22 - 28 Dec)': { prev: 'Week 48 (24 - 30 Nov)', growth: -6.0 },
+                'Week 1 (29 Dec - 4 Jan)': { prev: 'Week 49 (1 - 7 Dec)', growth: -47.4 },
+                'Week 2 (5 - 11 Jan)': { prev: 'Week 50 (8 - 14 Dec)', growth: +74.5 },
+                'Week 3 (12 - 18 Jan)': { prev: 'Week 51 (15 - 21 Dec)', growth: -63.1 },
+                'Week 4 (19 - 25 Jan)': { prev: 'Week 52 (22 - 28 Dec)', growth: +109.3 },
+                'Week 6 (2 - 8 Feb)': { prev: 'Week 1 (29 Dec - 4 Jan)', growth: +59.4 },
+                'Week 7 (9 - 15 Feb)': { prev: 'Week 2 (5 - 11 Jan)', growth: -3.8 },
+                'Week 8 (16 - 22 Feb)': { prev: 'Week 3 (12 - 18 Jan)', growth: +92.0 },
+                'Week 9 (23 Feb - 1 Mar)': { prev: 'Week 4 (19 - 25 Jan)', growth: -70.2 },
+                'Week 10 (2 - 8 Mar)': { prev: 'Week 6 (2 - 8 Feb)', growth: +92.4 },
+                'Week 11 (9 - 15 Mar)': { prev: 'Week 7 (9 - 15 Feb)', growth: +23.8 },
+                'Week 12 (16 - 22 Mar)': { prev: 'Week 8 (16 - 22 Feb)', growth: +16.9 },
+                'Week 13 (23 - 29 Mar)': { prev: 'Week 9 (23 Feb - 1 Mar)', growth: +65.8 },
+                'Week 14 (30 Mar - 5 Apr)': { prev: 'Week 10 (2 - 8 Mar)', growth: -8.0 },
+                'Week 15 (6 - 12 Apr)': { prev: 'Week 11 (9 - 15 Mar)', growth: -67.0 },
+                'Week 16 (13 - 19 Apr)': { prev: 'Week 12 (16 - 22 Mar)', growth: -21.8 },
+                'Week 17 (20 - 26 Apr)': { prev: 'Week 13 (23 - 29 Mar)', growth: +124.3 },
+                'Week 18 (27 Apr - 3 May)': { prev: 'Week 14 (30 Mar - 5 Apr)', growth: +9.6 },
+                'Week 19 (4 - 10 May)': { prev: 'Week 15 (6 - 12 Apr)', growth: +27.2 },
+                'Week 20 (11 - 17 May)': { prev: 'Week 16 (13 - 19 Apr)', growth: -38.5 },
+                'Week 21 (18 - 24 May)': { prev: 'Week 17 (20 - 26 Apr)', growth: -11.7 },
+                'Week 22 (25 - 31 May)': { prev: 'Week 18 (27 Apr - 3 May)', growth: +57.4 },
+                'Week 23 (2 - 8 Jun)': { prev: 'Week 18 (27 Apr - 3 May)', growth: -64.7 },
+            };
+
+            charts.weeklyTrendChart = safeChart('weeklyTrendChart', {
+                type: 'bar',
+                data: {
+                    labels: weeklyTrendData.map(w => w.week),
+                    datasets: [
+                        {
+                            label: 'Cash-in',
+                            data: weeklyTrendData.map(w => w.cashin),
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const week = weeklyTrendData[context.dataIndex].week;
+                                    const mom = weekMoM[week];
+                                    const base = 'Cash-in: ' + formatCurrency(context.parsed.y);
+                                    if (!mom) return base;
+                                    const arrow = mom.growth >= 0 ? '▲' : '▼';
+                                    return [base, `${arrow} ${Math.abs(mom.growth)}% vs ${mom.prev}`];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: (value) => formatCurrency(value)
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'momLabels',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, data, scales: { x, y } } = chart;
+                        ctx.save();
+                        data.datasets[0].data.forEach((val, i) => {
+                            const week = weeklyTrendData[i].week;
+                            const mom = weekMoM[week];
+                            if (!mom || val === 0) return;
+                            const barX = x.getPixelForValue(i);
+                            const barTop = y.getPixelForValue(val);
+                            const arrow = mom.growth >= 0 ? '▲' : '▼';
+                            const label = `${arrow}${Math.abs(mom.growth).toFixed(0)}%`;
+                            ctx.fillStyle = mom.growth >= 0 ? '#15803d' : '#dc2626';
+                            ctx.font = 'bold 10px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(label, barX, barTop - 6);
+                        });
+                        ctx.restore();
+                    }
+                }]
+            });
+
+            // Weekly Volume Chart
+            charts.weeklyVolumeChart = safeChart('weeklyVolumeChart', {
+                type: 'bar',
+                data: {
+                    labels: weeklyTrendData.map(w => w.week),
+                    datasets: [{
+                        label: 'Invoice Count',
+                        data: weeklyTrendData.map(w => w.invoice_count),
+                        backgroundColor: 'rgba(251, 211, 141, 0.8)',
+                        borderColor: 'rgba(251, 211, 141, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.parsed.y + ' invoices'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Weekly Detail Table
+            const weeklyDetailBody = document.getElementById('weeklyDetailBody');
+            weeklyDetailBody.innerHTML = weeklyTrendData.map(w => {
+                let statusBadge = '';
+                if (w.collection_rate >= 95) statusBadge = '<span class="badge badge-green">Excellent</span>';
+                else if (w.collection_rate >= 85) statusBadge = '<span class="badge badge-blue">Good</span>';
+                else if (w.collection_rate >= 70) statusBadge = '<span class="badge badge-yellow">Fair</span>';
+                else statusBadge = '<span class="badge badge-red">Needs Attention</span>';
+
+                return `<tr>
+                    <td><strong>${w.week}</strong></td>
+                    <td>${w.invoice_count}</td>
+                    <td style="color: #48bb78;">${w.paid_count}</td>
+                    <td>${formatCurrency(w.invoiced)}</td>
+                    <td style="color: #48bb78;">${formatCurrency(w.collected)}</td>
+                    <td style="color: #f56565;">${formatCurrency(w.pending)}</td>
+                    <td><strong>${w.collection_rate.toFixed(1)}%</strong></td>
+                    <td>${statusBadge}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ========== MONTHLY REPORT TAB ==========
+        function initMonthlyTab() {
+            // Calculate totals from new data structure
+            const fastPayersTotal = vendorData.find(v => v.vendor_type === 'Fast Payer').cash_in;
+            const latePayersTotal = vendorData.find(v => v.vendor_type === 'Late payers').cash_in;
+            const onTimeTotal = vendorData.find(v => v.vendor_type === 'On Time').cash_in;
+            
+            const totalCashIn = fastPayersTotal + latePayersTotal + onTimeTotal;
+            const collectionRate = (totalCashIn / vendorData.reduce((s, v) => s + v.payment, 0)) * 100;
+
+            safeSet('collectionRate', collectionRate.toFixed(1) + '%');
+            safeSet('totalRevenue', formatCurrency(vendorData.reduce((s, v) => s + v.revenue, 0)));
+            safeSet('fastPayersTotal', formatCurrency(fastPayersTotal));
+            safeSet('latePayersTotal', formatCurrency(latePayersTotal));
+
+            charts.vendorTypeChart = safeChart('vendorTypeChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fast Payer (247)', 'On Time (92)', 'Late Payers (62)'],
+                    datasets: [{
+                        data: [fastPayersTotal, onTimeTotal, latePayersTotal],
+                        backgroundColor: [
+                            'rgba(72, 187, 120, 0.8)',
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(245, 101, 101, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.label + ': ' + formatCurrency(context.parsed)
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Monthly cash in based on actual collection data
+            const monthlyCashIn = [
+                3275761.75,  // Nov collected
+                3280568.16,  // Dec collected
+                3632488.84,  // Jan collected
+                3371709.71,  // Feb collected
+                2965823.70   // Mar collected
+            ];
+
+            charts.monthlyCashInChart = safeChart('monthlyCashInChart', {
+                type: 'line',
+                data: {
+                    labels: ['Nov 2025', 'Dec 2025', 'Jan 2026', 'Feb 2026', 'Mar 2026'],
+                    datasets: [{
+                        label: 'Cash Collected',
+                        data: monthlyCashIn,
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => formatCurrency(context.parsed.y)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: (value) => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+
+            charts.paymentSpeedChart = safeChart('paymentSpeedChart', {
+                type: 'bar',
+                data: {
+                    labels: ['Fast Payer\n(247 invoices)', 'On Time\n(92 invoices)', 'Late Payers\n(62 invoices)'],
+                    datasets: [{
+                        label: 'Collection Rate',
+                        data: [96.5, 98.6, 96.7],
+                        backgroundColor: [
+                            'rgba(72, 187, 120, 0.8)',
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(245, 101, 101, 0.8)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            charts.serviceTypeChart = safeChart('serviceTypeChart', {
+                type: 'pie',
+                data: {
+                    labels: ['Growth & Platform', 'Content Marketing', 'Service Fee'],
+                    datasets: [{
+                        data: [3074407.29, 85000, 8247.42],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(72, 187, 120, 0.8)',
+                            'rgba(251, 211, 141, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.label + ': ' + formatCurrency(context.parsed)
+                            }
+                        }
+                    }
+                }
+            });
+
+            const vendorTableBody = document.getElementById('vendorTableBody');
+            vendorTableBody.innerHTML = vendorData.map(v => `
+                <tr>
+                    <td><strong>${v.vendor_type}</strong></td>
+                    <td>${v.invoice_count} invoices</td>
+                    <td>${formatCurrency(v.revenue)}</td>
+                    <td>${formatCurrency(v.payment)}</td>
+                    <td>${formatCurrency(v.cash_in)}</td>
+                    <td><strong>${((v.cash_in / v.payment) * 100).toFixed(1)}%</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        // ========== BRAND BEHAVIOR TAB ==========
+        // ========== BRAND BEHAVIOR DATA (ALL BRANDS) ==========
+        const brandBehaviorData = [
+            {name:"Easy Health",total:2540136,avg_monthly:423356,payments:6,avg_days:19.5,min_days:18,max_days:22,std_days:1.5,consistency:0.93,monthly:{"Dec 2025":419215,"Jan 2026":422311,"Feb 2026":450089,"Mar 2026":397594,"Apr 2026":448946,"May 2026":401981},predicted_jun:423356,pred_date:"24 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Easy Burger",total:1313066,avg_monthly:218844,payments:12,avg_days:23.3,min_days:9,max_days:30,std_days:6.9,consistency:0.71,monthly:{"Dec 2025":222613,"Jan 2026":231254,"Feb 2026":226984,"Mar 2026":206216,"Apr 2026":217123,"May 2026":208876},predicted_jun:218844,pred_date:"28 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Cholos",total:1147758,avg_monthly:179547,payments:16,avg_days:37.4,min_days:16,max_days:51,std_days:12.3,consistency:0.68,monthly:{"Dec 2025":184504,"Jan 2026":107661,"Feb 2026":201292,"Mar 2026":223384,"Apr 2026":248052,"May 2026":112389},predicted_jun:179547,pred_date:"12 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"BIANCA Italian Restaurant",total:771004,avg_monthly:172992,payments:26,avg_days:33.9,min_days:26,max_days:55,std_days:9.7,consistency:0.72,monthly:{"Dec 2025":192456,"Jan 2026":220265,"Feb 2026":0,"Mar 2026":183624,"Apr 2026":95624,"May 2026":0},predicted_jun:172992,pred_date:"8 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Pizza Mania",total:742631,avg_monthly:123772,payments:7,avg_days:47.7,min_days:38,max_days:69,std_days:10.6,consistency:0.78,monthly:{"Dec 2025":196063,"Jan 2026":98027,"Feb 2026":109744,"Mar 2026":111260,"Apr 2026":102795,"May 2026":124743},predicted_jun:123772,pred_date:"22 Jul",pred_week:"Week 30 (20–26 Jul)",pred_range:"",paid_jun:false},
+            {name:"Breakfast Story",total:674255,avg_monthly:112376,payments:11,avg_days:22.2,min_days:14,max_days:31,std_days:6.2,consistency:0.73,monthly:{"Dec 2025":42727,"Jan 2026":40863,"Feb 2026":51724,"Mar 2026":104686,"Apr 2026":197216,"May 2026":237040},predicted_jun:112376,pred_date:"27 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Saigon Recipe",total:643313,avg_monthly:107219,payments:9,avg_days:30.1,min_days:9,max_days:65,std_days:19.8,consistency:0.36,monthly:{"Dec 2025":139536,"Jan 2026":158425,"Feb 2026":91611,"Mar 2026":83939,"Apr 2026":97082,"May 2026":72721},predicted_jun:107219,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Heng Hoy Thod & Kamoo Krata Thong",total:624071,avg_monthly:124814,payments:7,avg_days:35.7,min_days:25,max_days:55,std_days:10.8,consistency:0.71,monthly:{"Dec 2025":167351,"Jan 2026":0,"Feb 2026":87263,"Mar 2026":182663,"Apr 2026":92929,"May 2026":93866},predicted_jun:124814,pred_date:"10 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"2GO Brands",total:571993,avg_monthly:95332,payments:6,avg_days:27.2,min_days:9,max_days:53,std_days:16.5,consistency:0.42,monthly:{"Dec 2025":57568,"Jan 2026":81239,"Feb 2026":25017,"Mar 2026":84954,"Apr 2026":156475,"May 2026":166741},predicted_jun:95332,pred_date:"2 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Chokdee Dimsum",total:541651,avg_monthly:108330,payments:6,avg_days:29.2,min_days:26,max_days:37,std_days:4.0,consistency:0.87,monthly:{"Dec 2025":71848,"Jan 2026":94021,"Feb 2026":95338,"Mar 2026":85205,"Apr 2026":0,"May 2026":195239},predicted_jun:108330,pred_date:"4 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Peppina & Panetti",total:536192,avg_monthly:89366,payments:6,avg_days:29.7,min_days:27,max_days:31,std_days:1.5,consistency:0.95,monthly:{"Dec 2025":98018,"Jan 2026":99935,"Feb 2026":93871,"Mar 2026":72424,"Apr 2026":87975,"May 2026":83970},predicted_jun:89366,pred_date:"4 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Le Lapin Sandwich",total:533962,avg_monthly:88994,payments:7,avg_days:48.4,min_days:38,max_days:73,std_days:12.0,consistency:0.76,monthly:{"Dec 2025":138057,"Jan 2026":76195,"Feb 2026":70125,"Mar 2026":79505,"Apr 2026":72426,"May 2026":97655},predicted_jun:88994,pred_date:"23 Jul",pred_week:"Week 30 (20–26 Jul)",pred_range:"",paid_jun:false},
+            {name:"So Vegan",total:526034,avg_monthly:108697,payments:6,avg_days:29.5,min_days:12,max_days:37,std_days:9.4,consistency:0.69,monthly:{"Dec 2025":82190,"Jan 2026":79165,"Feb 2026":0,"Mar 2026":176390,"Apr 2026":0,"May 2026":97043},predicted_jun:108697,pred_date:"4 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Holey Artisan",total:517810,avg_monthly:86302,payments:7,avg_days:26.4,min_days:21,max_days:47,std_days:9.3,consistency:0.66,monthly:{"Dec 2025":150546,"Jan 2026":70364,"Feb 2026":77566,"Mar 2026":69657,"Apr 2026":79541,"May 2026":70135},predicted_jun:86302,pred_date:"1 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Kumtsu",total:448160,avg_monthly:224080,payments:3,avg_days:31.0,min_days:18,max_days:39,std_days:11.4,consistency:0.65,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":128732,"May 2026":319429},predicted_jun:224080,pred_date:"6 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"SOHO Pizza",total:447625,avg_monthly:447626,payments:4,avg_days:60.5,min_days:20,max_days:111,std_days:39.0,consistency:0.37,monthly:{"Dec 2025":447626,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0},predicted_jun:447626,pred_date:"4 Aug",pred_week:"Week 32 (3–9 Aug)",pred_range:"",paid_jun:false},
+            {name:"Ezoya",total:436305,avg_monthly:87261,payments:6,avg_days:38.7,min_days:6,max_days:83,std_days:30.1,consistency:0.24,monthly:{"Dec 2025":64260,"Jan 2026":126656,"Feb 2026":0,"Mar 2026":72993,"Apr 2026":80554,"May 2026":91843},predicted_jun:87261,pred_date:"13 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Al Saray",total:436272,avg_monthly:109068,payments:5,avg_days:29.2,min_days:27,max_days:31,std_days:1.5,consistency:0.95,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":109050,"Mar 2026":99476,"Apr 2026":119607,"May 2026":108139},predicted_jun:109068,pred_date:"4 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Hunter Poke",total:400547,avg_monthly:66758,payments:7,avg_days:43.4,min_days:26,max_days:51,std_days:8.7,consistency:0.8,monthly:{"Dec 2025":50014,"Jan 2026":54891,"Feb 2026":52729,"Mar 2026":61162,"Apr 2026":54637,"May 2026":127114},predicted_jun:66758,pred_date:"18 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Larder",total:360528,avg_monthly:70513,payments:10,avg_days:33.9,min_days:8,max_days:78,std_days:20.9,consistency:0.4,monthly:{"Dec 2025":129998,"Jan 2026":45303,"Feb 2026":0,"Mar 2026":44849,"Apr 2026":93194,"May 2026":39220},predicted_jun:70513,pred_date:"8 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Mahmoud Shawarma",total:351480,avg_monthly:58580,payments:6,avg_days:12.5,min_days:8,max_days:20,std_days:4.5,consistency:0.66,monthly:{"Dec 2025":40269,"Jan 2026":62105,"Feb 2026":59802,"Mar 2026":61111,"Apr 2026":63622,"May 2026":64570},predicted_jun:58580,pred_date:"17 Jun",pred_week:"Week 25 (15–21 Jun)",pred_range:"",paid_jun:false},
+            {name:"Nico's & Protein Box & Chef Curry",total:330701,avg_monthly:66140,payments:16,avg_days:32.7,min_days:25,max_days:72,std_days:15.5,consistency:0.54,monthly:{"Dec 2025":42624,"Jan 2026":0,"Feb 2026":53884,"Mar 2026":98799,"Apr 2026":68537,"May 2026":66857},predicted_jun:66140,pred_date:"7 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Food4Thought & Bella Madre Pizza",total:329491,avg_monthly:109830,payments:5,avg_days:33.6,min_days:18,max_days:55,std_days:18.3,consistency:0.47,monthly:{"Dec 2025":0,"Jan 2026":64395,"Feb 2026":0,"Mar 2026":133198,"Apr 2026":0,"May 2026":131898},predicted_jun:109830,pred_date:"8 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Giglio & Rocket",total:325108,avg_monthly:54185,payments:6,avg_days:17.0,min_days:13,max_days:30,std_days:6.5,consistency:0.64,monthly:{"Dec 2025":48146,"Jan 2026":54009,"Feb 2026":57049,"Mar 2026":50793,"Apr 2026":61036,"May 2026":54075},predicted_jun:54185,pred_date:"22 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Eggday",total:320634,avg_monthly:160318,payments:4,avg_days:66.0,min_days:30,max_days:103,std_days:33.4,consistency:0.5,monthly:{"Dec 2025":0,"Jan 2026":97907,"Feb 2026":0,"Mar 2026":222728,"Apr 2026":0,"May 2026":0},predicted_jun:160318,pred_date:"10 Aug",pred_week:"Week 33 (10–16 Aug)",pred_range:"",paid_jun:false},
+            {name:"Elvis Suki",total:319436,avg_monthly:106479,payments:7,avg_days:27.1,min_days:16,max_days:34,std_days:7.8,consistency:0.72,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":215594,"Apr 2026":72500,"May 2026":31342},predicted_jun:106479,pred_date:"2 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Mama Pasta",total:303370,avg_monthly:75842,payments:5,avg_days:52.0,min_days:27,max_days:73,std_days:18.4,consistency:0.65,monthly:{"Dec 2025":58604,"Jan 2026":70353,"Feb 2026":0,"Mar 2026":128985,"Apr 2026":45428,"May 2026":0},predicted_jun:75842,pred_date:"27 Jul",pred_week:"Week 31 (27 Jul – 2 Aug)",pred_range:"",paid_jun:false},
+            {name:"Sutunthip Vegan",total:295504,avg_monthly:49251,payments:6,avg_days:11.3,min_days:8,max_days:16,std_days:2.9,consistency:0.77,monthly:{"Dec 2025":43524,"Jan 2026":48347,"Feb 2026":52191,"Mar 2026":50768,"Apr 2026":55712,"May 2026":44964},predicted_jun:49251,pred_date:"16 Jun",pred_week:"Week 25 (15–21 Jun)",pred_range:"",paid_jun:false},
+            {name:"Tonkatsu Koseki Bekkaku",total:294344,avg_monthly:49057,payments:12,avg_days:29.8,min_days:27,max_days:32,std_days:1.5,consistency:0.95,monthly:{"Dec 2025":55793,"Jan 2026":50247,"Feb 2026":53752,"Mar 2026":48657,"Apr 2026":46933,"May 2026":38962},predicted_jun:49057,pred_date:"4 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Apollo Duck",total:288643,avg_monthly:48107,payments:6,avg_days:18.7,min_days:11,max_days:27,std_days:5.6,consistency:0.72,monthly:{"Dec 2025":53813,"Jan 2026":44457,"Feb 2026":44813,"Mar 2026":45716,"Apr 2026":51626,"May 2026":48218},predicted_jun:48107,pred_date:"23 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Have a Zeed",total:258970,avg_monthly:43162,payments:48,avg_days:25.3,min_days:22,max_days:57,std_days:5.1,consistency:0.81,monthly:{"Dec 2025":37558,"Jan 2026":43835,"Feb 2026":44002,"Mar 2026":42275,"Apr 2026":44982,"May 2026":46318},predicted_jun:43162,pred_date:"30 Jun",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"D'ARK",total:254798,avg_monthly:50960,payments:7,avg_days:34.0,min_days:17,max_days:70,std_days:17.0,consistency:0.52,monthly:{"Dec 2025":39773,"Jan 2026":78016,"Feb 2026":34817,"Mar 2026":0,"Apr 2026":32519,"May 2026":69673},predicted_jun:50960,pred_date:"9 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Onnie's Recipe",total:250518,avg_monthly:50104,payments:6,avg_days:32.0,min_days:20,max_days:40,std_days:8.5,consistency:0.74,monthly:{"Dec 2025":0,"Jan 2026":25417,"Feb 2026":37973,"Mar 2026":100396,"Apr 2026":47187,"May 2026":39546},predicted_jun:50104,pred_date:"7 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Ruen Petch Suki",total:240146,avg_monthly:40025,payments:6,avg_days:29.5,min_days:25,max_days:32,std_days:2.6,consistency:0.92,monthly:{"Dec 2025":36478,"Jan 2026":38037,"Feb 2026":42868,"Mar 2026":38246,"Apr 2026":44191,"May 2026":40328},predicted_jun:40025,pred_date:"4 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Nine Pastry",total:238662,avg_monthly:39777,payments:7,avg_days:10.3,min_days:7,max_days:15,std_days:2.8,consistency:0.75,monthly:{"Dec 2025":37748,"Jan 2026":37063,"Feb 2026":31199,"Mar 2026":38140,"Apr 2026":55305,"May 2026":39208},predicted_jun:39777,pred_date:"15 Jun",pred_week:"Week 25 (15–21 Jun)",pred_range:"",paid_jun:false},
+            {name:"StrackYum",total:226607,avg_monthly:32128,payments:7,avg_days:39.4,min_days:34,max_days:59,std_days:8.9,consistency:0.78,monthly:{"Dec 2025":33656,"Jan 2026":30387,"Feb 2026":26106,"Mar 2026":33927,"Apr 2026":33468,"May 2026":35221},predicted_jun:32128,pred_date:"14 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Softfood",total:217433,avg_monthly:36239,payments:7,avg_days:12.0,min_days:8,max_days:17,std_days:3.8,consistency:0.71,monthly:{"Dec 2025":30728,"Jan 2026":30060,"Feb 2026":37755,"Mar 2026":36376,"Apr 2026":43089,"May 2026":39425},predicted_jun:36239,pred_date:"17 Jun",pred_week:"Week 25 (15–21 Jun)",pred_range:"",paid_jun:false},
+            {name:"Vistro",total:205741,avg_monthly:34290,payments:7,avg_days:30.0,min_days:25,max_days:39,std_days:4.7,consistency:0.85,monthly:{"Dec 2025":66099,"Jan 2026":28213,"Feb 2026":27100,"Mar 2026":26185,"Apr 2026":31919,"May 2026":26225},predicted_jun:34290,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Grow Tea.studio",total:197191,avg_monthly:49298,payments:9,avg_days:70.6,min_days:31,max_days:170,std_days:47.2,consistency:0.34,monthly:{"Dec 2025":19283,"Jan 2026":0,"Feb 2026":50078,"Mar 2026":87652,"Apr 2026":0,"May 2026":40179},predicted_jun:49298,pred_date:"14 Aug",pred_week:"Week 33 (10–16 Aug)",pred_range:"",paid_jun:false},
+            {name:"Mala Social",total:192430,avg_monthly:64143,payments:7,avg_days:44.7,min_days:14,max_days:68,std_days:18.3,consistency:0.6,monthly:{"Dec 2025":85157,"Jan 2026":55273,"Feb 2026":52000,"Mar 2026":0,"Apr 2026":0,"May 2026":0},predicted_jun:64143,pred_date:"19 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Tairyo Sushi + Nanohana",total:191283,avg_monthly:31881,payments:7,avg_days:20.6,min_days:10,max_days:42,std_days:11.6,consistency:0.46,monthly:{"Dec 2025":17307,"Jan 2026":25039,"Feb 2026":37592,"Mar 2026":33969,"Apr 2026":42419,"May 2026":34958},predicted_jun:31881,pred_date:"25 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Bangkok Bob's",total:190742,avg_monthly:38149,payments:7,avg_days:36.3,min_days:22,max_days:52,std_days:12.3,consistency:0.67,monthly:{"Dec 2025":0,"Jan 2026":56652,"Feb 2026":31336,"Mar 2026":10400,"Apr 2026":26949,"May 2026":65406},predicted_jun:38149,pred_date:"11 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Chubby Dough",total:189387,avg_monthly:37878,payments:6,avg_days:67.5,min_days:48,max_days:75,std_days:10.3,consistency:0.85,monthly:{"Dec 2025":0,"Jan 2026":30555,"Feb 2026":21496,"Mar 2026":38957,"Apr 2026":32298,"May 2026":66082},predicted_jun:37878,pred_date:"11 Aug",pred_week:"Week 33 (10–16 Aug)",pred_range:"",paid_jun:false},
+            {name:"ZabZab 31",total:184482,avg_monthly:30747,payments:7,avg_days:34.7,min_days:25,max_days:40,std_days:5.5,consistency:0.85,monthly:{"Dec 2025":28704,"Jan 2026":28437,"Feb 2026":26977,"Mar 2026":27660,"Apr 2026":22861,"May 2026":49844},predicted_jun:30747,pred_date:"9 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Sati",total:181918,avg_monthly:36384,payments:6,avg_days:42.3,min_days:30,max_days:69,std_days:13.9,consistency:0.68,monthly:{"Dec 2025":22528,"Jan 2026":21271,"Feb 2026":0,"Mar 2026":66427,"Apr 2026":34477,"May 2026":37216},predicted_jun:36384,pred_date:"17 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Jungle Juice + Jasper Jogurt",total:180367,avg_monthly:90184,payments:3,avg_days:28.0,min_days:21,max_days:34,std_days:6.6,consistency:0.77,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":53266,"Apr 2026":0,"May 2026":127101},predicted_jun:90184,pred_date:"3 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Canton Paradise",total:169959,avg_monthly:28327,payments:6,avg_days:30.3,min_days:28,max_days:32,std_days:1.4,consistency:0.96,monthly:{"Dec 2025":25369,"Jan 2026":23358,"Feb 2026":28902,"Mar 2026":26786,"Apr 2026":34000,"May 2026":31545},predicted_jun:28327,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Nadimos Lebanese Restaurant",total:164941,avg_monthly:32988,payments:6,avg_days:37.2,min_days:13,max_days:80,std_days:25.1,consistency:0.34,monthly:{"Dec 2025":19292,"Jan 2026":30999,"Feb 2026":31505,"Mar 2026":56333,"Apr 2026":0,"May 2026":26813},predicted_jun:32988,pred_date:"12 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Saigon Sandwich",total:152331,avg_monthly:76166,payments:4,avg_days:30.2,min_days:25,max_days:36,std_days:4.6,consistency:0.85,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":72775,"Apr 2026":0,"May 2026":79557},predicted_jun:76166,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Arabesque",total:144179,avg_monthly:27915,payments:13,avg_days:30.1,min_days:24,max_days:33,std_days:3.0,consistency:0.9,monthly:{"Dec 2025":17890,"Jan 2026":20660,"Feb 2026":0,"Mar 2026":43819,"Apr 2026":29292,"May 2026":0},predicted_jun:27915,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Mad Pizza & Kaprao Fury",total:130799,avg_monthly:32700,payments:4,avg_days:41.8,min_days:38,max_days:44,std_days:2.9,consistency:0.93,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":23907,"Mar 2026":28536,"Apr 2026":35352,"May 2026":43005},predicted_jun:32700,pred_date:"16 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Birdies",total:124800,avg_monthly:31200,payments:4,avg_days:70.0,min_days:48,max_days:97,std_days:22.3,consistency:0.69,monthly:{"Dec 2025":31200,"Jan 2026":0,"Feb 2026":31200,"Mar 2026":0,"Apr 2026":0,"May 2026":31200},predicted_jun:31200,pred_date:"14 Aug",pred_week:"Week 33 (10–16 Aug)",pred_range:"",paid_jun:false},
+            {name:"Mae Noo Ayng",total:118715,avg_monthly:19786,payments:26,avg_days:55.6,min_days:32,max_days:200,std_days:31.3,consistency:0.45,monthly:{"Dec 2025":10000,"Jan 2026":10000,"Feb 2026":20000,"Mar 2026":38716,"Apr 2026":20000,"May 2026":20000},predicted_jun:19786,pred_date:"30 Jul",pred_week:"Week 31 (27 Jul – 2 Aug)",pred_range:"",paid_jun:false},
+            {name:"Milch Japan Cheesecake",total:107080,avg_monthly:53540,payments:2,avg_days:21.0,min_days:14,max_days:28,std_days:9.9,consistency:0.55,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":51393,"May 2026":55688},predicted_jun:53540,pred_date:"26 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Menya Itto",total:93384,avg_monthly:15564,payments:6,avg_days:26.0,min_days:25,max_days:28,std_days:1.3,consistency:0.95,monthly:{"Dec 2025":18152,"Jan 2026":17694,"Feb 2026":17061,"Mar 2026":13454,"Apr 2026":14519,"May 2026":12505},predicted_jun:15564,pred_date:"1 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"CHUNN",total:90853,avg_monthly:45427,payments:4,avg_days:30.0,min_days:8,max_days:51,std_days:18.6,consistency:0.4,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":37598,"Apr 2026":0,"May 2026":53256},predicted_jun:45427,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Indus",total:90631,avg_monthly:22658,payments:6,avg_days:40.5,min_days:18,max_days:64,std_days:19.6,consistency:0.53,monthly:{"Dec 2025":16064,"Jan 2026":0,"Feb 2026":26788,"Mar 2026":31204,"Apr 2026":0,"May 2026":16575},predicted_jun:22658,pred_date:"15 Jul",pred_week:"Week 29 (13–19 Jul)",pred_range:"",paid_jun:false},
+            {name:"Sunbird Smoothie & Sandwich",total:87405,avg_monthly:21851,payments:5,avg_days:26.0,min_days:18,max_days:31,std_days:5.9,consistency:0.78,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":22557,"Mar 2026":20901,"Apr 2026":24674,"May 2026":19273},predicted_jun:21851,pred_date:"1 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Pastaaioli",total:88331,avg_monthly:17666,payments:6,avg_days:32.8,min_days:27,max_days:49,std_days:8.1,consistency:0.76,monthly:{"Dec 2025":0,"Jan 2026":31298,"Feb 2026":13379,"Mar 2026":10863,"Apr 2026":16199,"May 2026":16593},predicted_jun:17666,pred_date:"7 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Charcoal",total:86698,avg_monthly:14450,payments:6,avg_days:26.5,min_days:26,max_days:27,std_days:0.5,consistency:0.98,monthly:{"Dec 2025":17066,"Jan 2026":18496,"Feb 2026":14984,"Mar 2026":10824,"Apr 2026":12080,"May 2026":13248},predicted_jun:14450,pred_date:"1 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"LAVA Fire Grill",total:82304,avg_monthly:20576,payments:5,avg_days:33.8,min_days:26,max_days:55,std_days:12.0,consistency:0.65,monthly:{"Dec 2025":18856,"Jan 2026":21474,"Feb 2026":0,"Mar 2026":27929,"Apr 2026":14045,"May 2026":0},predicted_jun:20576,pred_date:"8 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Oppa Daek",total:81982,avg_monthly:40991,payments:2,avg_days:27.0,min_days:25,max_days:29,std_days:2.8,consistency:0.9,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":32800,"May 2026":49182},predicted_jun:40991,pred_date:"2 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Holy Belly",total:80843,avg_monthly:16601,payments:6,avg_days:34.2,min_days:26,max_days:55,std_days:10.8,consistency:0.69,monthly:{"Dec 2025":11842,"Jan 2026":11919,"Feb 2026":0,"Mar 2026":25770,"Apr 2026":16873,"May 2026":0},predicted_jun:16601,pred_date:"9 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Antico Fornaio",total:73863,avg_monthly:36932,payments:3,avg_days:27.5,min_days:25,max_days:30,std_days:3.5,consistency:0.88,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":41081,"May 2026":32783},predicted_jun:36932,pred_date:"2 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"The Missing Burros",total:73241,avg_monthly:14649,payments:6,avg_days:32.2,min_days:24,max_days:36,std_days:4.4,consistency:0.87,monthly:{"Dec 2025":26297,"Jan 2026":0,"Feb 2026":11076,"Mar 2026":12315,"Apr 2026":12020,"May 2026":11535},predicted_jun:14649,pred_date:"7 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"AGE",total:69952,avg_monthly:34976,payments:4,avg_days:69.2,min_days:34,max_days:104,std_days:28.8,consistency:0.59,monthly:{"Dec 2025":31332,"Jan 2026":0,"Feb 2026":0,"Mar 2026":38621,"Apr 2026":0,"May 2026":0},predicted_jun:34976,pred_date:"13 Aug",pred_week:"Week 33 (10–16 Aug)",pred_range:"",paid_jun:false},
+            {name:"Irodori",total:69929,avg_monthly:10108,payments:7,avg_days:12.7,min_days:6,max_days:27,std_days:7.2,consistency:0.47,monthly:{"Dec 2025":12679,"Jan 2026":10685,"Feb 2026":9961,"Mar 2026":8709,"Apr 2026":9674,"May 2026":8942},predicted_jun:10108,pred_date:"17 Jun",pred_week:"Week 25 (15–21 Jun)",pred_range:"",paid_jun:false},
+            {name:"El Mercado",total:67170,avg_monthly:23390,payments:3,avg_days:520.0,min_days:33,max_days:765,std_days:421.8,consistency:0.19,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":21523,"Apr 2026":0,"May 2026":25256},predicted_jun:23390,pred_date:"7 Nov",pred_week:"Week 44 (1–7 Nov)",pred_range:"",paid_jun:false},
+            {name:"Consulting (Tinna)",total:51463,avg_monthly:8577,payments:6,avg_days:30.0,min_days:28,max_days:31,std_days:1.1,consistency:0.96,monthly:{"Dec 2025":8577,"Jan 2026":8577,"Feb 2026":8577,"Mar 2026":8577,"Apr 2026":8577,"May 2026":8577},predicted_jun:8577,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Aribica",total:50522,avg_monthly:10104,payments:6,avg_days:18.5,min_days:10,max_days:29,std_days:6.2,consistency:0.68,monthly:{"Dec 2025":7005,"Jan 2026":16727,"Feb 2026":8278,"Mar 2026":7219,"Apr 2026":11293,"May 2026":0},predicted_jun:10104,pred_date:"23 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Cafe' Tartine",total:49732,avg_monthly:9947,payments:6,avg_days:20.3,min_days:8,max_days:49,std_days:15.4,consistency:0.28,monthly:{"Dec 2025":10033,"Jan 2026":8978,"Feb 2026":8692,"Mar 2026":8099,"Apr 2026":0,"May 2026":13931},predicted_jun:9947,pred_date:"25 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Mahasamut",total:45053,avg_monthly:45053,payments:2,avg_days:24.0,min_days:9,max_days:39,std_days:21.2,consistency:0.15,monthly:{"Dec 2025":45053,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0},predicted_jun:45053,pred_date:"29 Jun",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Fish Fat Bowls",total:43327,avg_monthly:21664,payments:2,avg_days:48.5,min_days:48,max_days:49,std_days:0.7,consistency:0.99,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":11492,"May 2026":31835},predicted_jun:21664,pred_date:"23 Jul",pred_week:"Week 30 (20–26 Jul)",pred_range:"",paid_jun:false},
+            {name:"Brassica Doughnuts",total:43250,avg_monthly:21626,payments:3,avg_days:28.0,min_days:26,max_days:30,std_days:2.8,consistency:0.9,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":22927,"May 2026":20324},predicted_jun:21626,pred_date:"3 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Danissa",total:40701,avg_monthly:13567,payments:3,avg_days:17.3,min_days:8,max_days:25,std_days:8.6,consistency:0.53,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":13090,"Apr 2026":14063,"May 2026":13548},predicted_jun:13567,pred_date:"22 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Chu",total:33100,avg_monthly:16550,payments:2,avg_days:21.5,min_days:14,max_days:29,std_days:10.6,consistency:0.53,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":16753,"May 2026":16347},predicted_jun:16550,pred_date:"26 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Sushi-Snack",total:29221,avg_monthly:14611,payments:2,avg_days:18.0,min_days:15,max_days:21,std_days:4.2,consistency:0.78,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":13345,"May 2026":15877},predicted_jun:14611,pred_date:"23 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Sunny Chan Specialty Croissant",total:19856,avg_monthly:19857,payments:1,avg_days:30.0,min_days:30,max_days:30,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":19857,"May 2026":0},predicted_jun:19857,pred_date:"5 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Henryfry Fried Chicken",total:15773,avg_monthly:7887,payments:3,avg_days:32.0,min_days:26,max_days:36,std_days:5.3,consistency:0.84,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":3886,"Apr 2026":0,"May 2026":11888},predicted_jun:7887,pred_date:"7 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Henryfry",total:15584,avg_monthly:7792,payments:3,avg_days:36.0,min_days:27,max_days:46,std_days:9.5,consistency:0.74,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":4557,"Apr 2026":0,"May 2026":11028},predicted_jun:7792,pred_date:"11 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Pani Sandwich and Bagel",total:15499,avg_monthly:7750,payments:2,avg_days:18.5,min_days:12,max_days:25,std_days:9.2,consistency:0.53,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":5791,"May 2026":9709},predicted_jun:7750,pred_date:"23 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+            {name:"Vinotecca",total:9624,avg_monthly:9625,payments:3,avg_days:45.0,min_days:20,max_days:73,std_days:26.6,consistency:0.42,monthly:{"Dec 2025":9625,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0},predicted_jun:9625,pred_date:"20 Jul",pred_week:"Week 30 (20–26 Jul)",pred_range:"",paid_jun:false},
+            {name:"L'Escargot Bistro",total:6474,avg_monthly:1618,payments:5,avg_days:34.6,min_days:30,max_days:36,std_days:2.6,consistency:0.93,monthly:{"Dec 2025":0,"Jan 2026":1262,"Feb 2026":1303,"Mar 2026":1733,"Apr 2026":0,"May 2026":2176},predicted_jun:1618,pred_date:"9 Jul",pred_week:"Week 28 (6–12 Jul)",pred_range:"",paid_jun:false},
+            {name:"Bambino",total:3428,avg_monthly:1143,payments:3,avg_days:28.0,min_days:26,max_days:31,std_days:2.6,consistency:0.91,monthly:{"Dec 2025":1625,"Jan 2026":786,"Feb 2026":1017,"Mar 2026":0,"Apr 2026":0,"May 2026":0},predicted_jun:1143,pred_date:"3 Jul",pred_week:"Week 27 (29 Jun – 5 Jul)",pred_range:"",paid_jun:false},
+            {name:"Standard Burger",total:1789,avg_monthly:1790,payments:1,avg_days:17.0,min_days:17,max_days:17,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":1790,"May 2026":0},predicted_jun:1790,pred_date:"22 Jun",pred_week:"Week 26 (22–28 Jun)",pred_range:"",paid_jun:false},
+        ];
+
+                const bbMonths = ['Dec 2025','Jan 2026','Feb 2026','Mar 2026','Apr 2026','May 2026'];
+        let bbSortCol = 'total', bbSortAsc = false, bbCurrentData = [...brandBehaviorData];
+
+        function bbGetSpeedLabel(avg) {
+            if (avg <= 30) return '<span class="badge badge-fast">Fast ≤30d</span>';
+            if (avg <= 45) return '<span class="badge badge-medium">Medium 31-45d</span>';
+            if (avg <= 60) return '<span class="badge badge-slow">Slow >45d</span>';
+            return '<span class="badge badge-erratic">Very Slow</span>';
+        }
+
+        function bbConsistencyColor(c) {
+            if (c >= 0.85) return '#22c55e';
+            if (c >= 0.65) return '#f59e0b';
+            return '#ef4444';
+        }
+
+        function bbMiniBar(monthly) {
+            const vals = bbMonths.map(m => monthly[m] || 0);
+            const mx = Math.max(...vals, 1);
+            return vals.map(v => {
+                const h = Math.round((v/mx)*24) || 2;
+                const cls = v === 0 ? 'zero' : '';
+                const color = v === 0 ? '' : `style="height:${h}px;background:#93c5fd;"`;
+                return `<div class="bb-bar ${cls}" ${color} title="฿${v.toLocaleString()}"></div>`;
+            }).join('');
+        }
+
+        function bbRenderTable(data) {
+            const tbody = document.getElementById('bb-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = data.map((b,i) => {
+                const predCell = b.paid_jun
+                    ? `<span style="font-size:11px;font-weight:700;color:#166534;background:#dcfce7;padding:3px 8px;border-radius:5px;">✅ Paid</span>`
+                    : b.predicted_jun > 0
+                        ? `<div class="pred-badge">${formatCurrency(b.predicted_jun)}</div>
+                           <div style="font-size:12px;font-weight:600;color:#0f766e;margin-top:4px;">📅 ${b.pred_date}</div>
+                           <div style="font-size:11px;color:#64748b;">${b.pred_week}</div>
+                           <div style="font-size:10px;color:#94a3b8;">Range: ${b.pred_range}</div>`
+                        : `<div style="font-size:11px;color:#94a3b8;">Unpredictable</div>
+                           <div style="font-size:10px;color:#94a3b8;">High variance (±${b.std_days}d)</div>`;
+                return `<tr>
+                    <td class="bb-rank">${i+1}</td>
+                    <td><div class="bb-brand-name">${b.name}</div><div style="font-size:11px;color:#94a3b8;">${b.payments} payments</div></td>
+                    <td><div class="bb-total">${formatCurrency(b.total)}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">avg ${formatCurrency(b.avg_monthly)}/mo</div></td>
+                    <td><div class="bb-mini-bar">${bbMiniBar(b.monthly)}</div></td>
+                    <td><div class="bb-days" style="color:${b.avg_days<=30?'#166534':b.avg_days<=45?'#854d0e':'#991b1b'}">${b.avg_days}d</div><div style="font-size:11px;color:#94a3b8;">${b.min_days}d – ${b.max_days}d</div></td>
+                    <td>${bbGetSpeedLabel(b.avg_days)}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="consistency-bar"><div class="consistency-fill" style="width:${b.consistency*100}%;background:${bbConsistencyColor(b.consistency)};"></div></div>
+                            <span style="font-size:12px;font-weight:600;color:${bbConsistencyColor(b.consistency)}">${Math.round(b.consistency*100)}%</span>
+                        </div>
+                        <div style="font-size:11px;color:#94a3b8;">±${b.std_days}d variance</div>
+                    </td>
+                    <td>${predCell}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function initBehaviorTab() {
+            const total = brandBehaviorData.reduce((s,b) => s+b.total, 0);
+            const creditNotes = -13517.81; // 9 credit notes from CSV (RV- entries)
+            const netTotal = 23496531; // hardcoded net: ฿23,496,530.86 rounded, verified from CSV
+            const avgDays = 35.7; // verified from CSV: mean of Issue-Paid Days across all positive payments
+
+            document.getElementById('bb-total').textContent = formatCurrency(netTotal);
+            document.getElementById('bb-avg-days').textContent = avgDays + 'd';
+
+            bbRenderTable(brandBehaviorData);
+
+            // Sort headers
+            document.querySelectorAll('#bb-main-table th[data-col]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const col = th.dataset.col;
+                    if (bbSortCol === col) bbSortAsc = !bbSortAsc;
+                    else { bbSortCol = col; bbSortAsc = false; }
+                    document.querySelectorAll('#bb-main-table th').forEach(t => t.classList.remove('sort-active'));
+                    th.classList.add('sort-active');
+                    th.querySelector('.sort-arrow').textContent = bbSortAsc ? '↑' : '↓';
+                    bbApplyFilters();
+                });
+            });
+
+            document.getElementById('bb-search').addEventListener('input', bbApplyFilters);
+            document.getElementById('bb-sort').addEventListener('change', (e) => {
+                bbSortCol = e.target.value; bbSortAsc = false; bbApplyFilters();
+            });
+            document.getElementById('bb-speed-filter').addEventListener('change', bbApplyFilters);
+        }
+
+        function bbApplyFilters() {
+            const search = document.getElementById('bb-search').value.toLowerCase();
+            const speed = document.getElementById('bb-speed-filter').value;
+            let data = [...brandBehaviorData];
+            if (search) data = data.filter(b => b.name.toLowerCase().includes(search));
+            if (speed === 'fast') data = data.filter(b => b.avg_days <= 30);
+            else if (speed === 'medium') data = data.filter(b => b.avg_days > 30 && b.avg_days <= 45);
+            else if (speed === 'slow') data = data.filter(b => b.avg_days > 45);
+            const col = bbSortCol;
+            data.sort((a,b) => {
+                let av = col==='name' ? a.name : col==='total' ? a.total : col==='avg_days' ? a.avg_days : col==='consistency' ? a.consistency : a.predicted_jun;
+                let bv = col==='name' ? b.name : col==='total' ? b.total : col==='avg_days' ? b.avg_days : col==='consistency' ? b.consistency : b.predicted_jun;
+                return bbSortAsc ? (av>bv?1:-1) : (av<bv?1:-1);
+            });
+            bbRenderTable(data);
+        }
+
+        // ========== EVENT LISTENERS ==========
+
+        // ========== INVOICE COLLECTION STATUS TAB ==========
+        function initCollectionTab() {
+            populateServiceTypeTables();
+            updateCollectionStats('all');
+            renderUnpaidBrandsTable('all'); // Initialize outstanding payments table
+        }
+
+        function populateServiceTypeTables() {
+            console.log('populateServiceTypeTables called');
+            
+            // Populate Growth & Platform Management table
+            const growthBody = document.getElementById('growthServiceBody');
+            const months = ['Nov 2025', 'Dec 2025', 'Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026'];
+            
+            console.log('Growth body element:', growthBody);
+            console.log('Months:', months);
+            console.log('invoiceCollectionByService:', invoiceCollectionByService);
+            
+            if (!growthBody) {
+                console.error('growthServiceBody element not found!');
+                return;
+            }
+            
+            let htmlContent = '';
+            months.forEach(month => {
+                const data = invoiceCollectionByService.growth[month];
+                console.log(`Processing ${month}:`, data);
+                
+                if (!data) {
+                    console.error(`No data for ${month}`);
+                    return;
+                }
+                
+                htmlContent += `<tr>
+                    <td><strong>${month}</strong></td>
+                    <td>${formatCurrency(data.total)}</td>
+                    <td style="color: #48bb78;">${formatCurrency(data.paid)}</td>
+                    <td style="color: #f56565;">${formatCurrency(data.pending)}</td>
+                    <td><strong style="color: ${data.collection_rate >= 95 ? '#48bb78' : data.collection_rate >= 80 ? '#f6ad55' : '#f56565'}">${data.collection_rate.toFixed(1)}%</strong></td>
+                    <td style="color: ${data.rate_45days >= 95 ? '#48bb78' : data.rate_45days >= 80 ? '#f6ad55' : '#f56565'}">${data.rate_45days.toFixed(1)}%</td>
+                    <td style="color: ${data.rate_by_due >= 95 ? '#48bb78' : data.rate_by_due >= 80 ? '#f6ad55' : '#f56565'}">${data.rate_by_due.toFixed(1)}%</td>
+                    <td style="background: #c2e4ee;">${formatCurrency(data.cashin_total)}</td>
+                    <td style="color: #48bb78; background: #c2e4ee;">${formatCurrency(data.cashin_collected)}</td>
+                    <td style="color: #f56565; background: #c2e4ee;">${formatCurrency(data.cashin_pending)}</td>
+                </tr>`;
+            });
+            
+            console.log('Generated HTML length:', htmlContent.length);
+            growthBody.innerHTML = htmlContent;
+            console.log('Growth body populated');
+        }
+
+        function updateCollectionStats(serviceType, selectedMonth = 'all') {
+            currentServiceFilter = serviceType;
+            
+            let dataSource;
+            if (serviceType === 'growth') {
+                dataSource = invoiceCollectionByService.growth;
+            } else if (serviceType === 'other') {
+                dataSource = invoiceCollectionByService.other;
+            } else {
+                dataSource = {};
+                const allMonths = Object.keys(invoiceCollectionData);
+                allMonths.forEach(month => {
+                    dataSource[month] = invoiceCollectionData[month];
+                });
+            }
+            
+            let months;
+            if (selectedMonth === 'all') {
+                months = Object.keys(dataSource);
+            } else {
+                months = [selectedMonth];
+            }
+            
+            const totalAmount = months.reduce((sum, m) => sum + dataSource[m].total, 0);
+            const totalPaid = months.reduce((sum, m) => sum + dataSource[m].paid, 0);
+            const totalPending = months.reduce((sum, m) => sum + dataSource[m].pending, 0);
+            const overallCollectionRate = (totalPaid / totalAmount) * 100;
+            const overallPendingRate = (totalPending / totalAmount) * 100;
+
+            safeSet('totalToBePaid', formatCurrency(totalAmount));
+            safeSet('overallCollectionRate', overallCollectionRate.toFixed(1) + '%');
+            safeSet('totalPending', formatCurrency(totalPending));
+            safeSet('pendingRate', overallPendingRate.toFixed(1) + '% pending');
+            
+            // Update labels
+            if (serviceType === 'growth') {
+                safeSet('totalToBePaidLabel', 'Growth & Platform Management');
+                safeSet('collectionRateLabel', 'Growth & Platform Management rate');
+            } else if (serviceType === 'other') {
+                safeSet('totalToBePaidLabel', 'Other Services');
+                safeSet('collectionRateLabel', 'Other services rate');
+            } else {
+                safeSet('totalToBePaidLabel', 'All services');
+                safeSet('collectionRateLabel', 'Overall collection');
+            }
+
+            // Update or create charts
+            if (charts.monthlyCollectionChart) {
+                charts.monthlyCollectionChart.destroy();
+                charts.thisMonthPieChart.destroy();
+                charts.lastMonthPieChart.destroy();
+            }
+
+            charts.monthlyCollectionChart = safeChart('monthlyCollectionChart', {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {label: 'Collected', data: months.map(m => dataSource[m].paid), backgroundColor: 'rgba(72, 187, 120, 0.8)'},
+                        {label: 'Pending', data: months.map(m => dataSource[m].pending), backgroundColor: 'rgba(245, 101, 101, 0.8)'}
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {y: {ticks: {callback: (value) => formatCurrency(value)}}},
+                    plugins: {tooltip: {callbacks: {label: (c) => c.dataset.label + ': ' + formatCurrency(c.parsed.y)}}}
+                }
+            });
+
+            // This Month Pie Chart (April 2026)
+            const thisMonth = months[months.length - 1];
+            const thisMonthData = dataSource[thisMonth];
+            charts.thisMonthPieChart = safeChart('thisMonthPieChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Collected', 'Pending'],
+                    datasets: [{data: [thisMonthData.paid, thisMonthData.pending], backgroundColor: ['rgba(72, 187, 120, 0.8)', 'rgba(245, 101, 101, 0.8)'], borderWidth: 2}]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {position: 'bottom'},
+                        tooltip: {
+                            callbacks: {
+                                label: (c) => {
+                                    const total = thisMonthData.paid + thisMonthData.pending;
+                                    const percentage = ((c.parsed / total) * 100).toFixed(1);
+                                    return c.label + ': ' + formatCurrency(c.parsed) + ' (' + percentage + '%)';
+                                }
+                            }
+                        },
+                        title: {display: true, text: thisMonth, font: {size: 14, weight: 'bold'}},
+                        datalabels: {
+                            color: '#fff',
+                            font: {size: 18, weight: 'bold'},
+                            formatter: (value, ctx) => {
+                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return percentage + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            // Last Month Pie Chart (March 2026)
+            const lastMonth = months[months.length - 2];
+            const lastMonthData = dataSource[lastMonth];
+            charts.lastMonthPieChart = safeChart('lastMonthPieChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Collected', 'Pending'],
+                    datasets: [{data: [lastMonthData.paid, lastMonthData.pending], backgroundColor: ['rgba(72, 187, 120, 0.8)', 'rgba(245, 101, 101, 0.8)'], borderWidth: 2}]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {position: 'bottom'},
+                        tooltip: {
+                            callbacks: {
+                                label: (c) => {
+                                    const total = lastMonthData.paid + lastMonthData.pending;
+                                    const percentage = ((c.parsed / total) * 100).toFixed(1);
+                                    return c.label + ': ' + formatCurrency(c.parsed) + ' (' + percentage + '%)';
+                                }
+                            }
+                        },
+                        title: {display: true, text: lastMonth, font: {size: 14, weight: 'bold'}},
+                        datalabels: {
+                            color: '#fff',
+                            font: {size: 18, weight: 'bold'},
+                            formatter: (value, ctx) => {
+                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return percentage + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        // Payment Timing Filter and Display Function
+        function filterPaymentTiming() { /* removed - elements no longer exist */ }
+
+        function renderUnpaidBrandsTable(selectedMonth) {
+            const serviceType = currentServiceFilter;
+            let dataSource;
+            
+            if (serviceType === 'growth') {
+                dataSource = invoiceCollectionByService.growth;
+            } else if (serviceType === 'other') {
+                dataSource = invoiceCollectionByService.other;
+            } else {
+                dataSource = invoiceCollectionData;
+            }
+            
+            const unpaidBrandsBody = document.getElementById('unpaidBrandsBody');
+            
+            // Use the outstandingPaymentsData instead of the old structure
+            let allUnpaid = outstandingPaymentsData.map(item => ({
+                brand: item.brand,
+                months: item.months.join(', '),
+                invoices: item.invoices,
+                amount: item.amount,
+                aging: item.aging
+            }));
+            
+            // Sort by amount descending
+            allUnpaid.sort((a, b) => b.amount - a.amount);
+            
+            // Populate table with aging badges
+            unpaidBrandsBody.innerHTML = allUnpaid.map(item => {
+                let agingBadge = '';
+                if (item.aging === '360+') {
+                    agingBadge = '<span class="badge badge-red">360+ Days</span>';
+                } else if (item.aging === '90-360') {
+                    agingBadge = '<span class="badge" style="background: #f6ad55; color: white;">90-360 Days</span>';
+                } else if (item.aging === '1-90') {
+                    agingBadge = '<span class="badge" style="background: #f6ad55; color: white;">1-90 Days</span>';
+                } else {
+                    agingBadge = '<span class="badge badge-green">Current</span>';
+                }
+                
+                return `<tr>
+                    <td><strong>${item.brand}</strong></td>
+                    <td style="font-size: 13px; color: #4a5568;">${item.months}</td>
+                    <td style="font-size: 12px; color: #718096;">${item.invoices.slice(0, 3).join(', ')}${item.invoices.length > 3 ? ` +${item.invoices.length - 3} more` : ''}</td>
+                    <td><strong style="color: #f56565;">${formatCurrency(item.amount)}</strong></td>
+                    <td>${agingBadge}</td>
+                </tr>`;
+            }).join('');
+            
+            // Update stats
+            const statsLabel = document.getElementById('unpaidBrandsLabel');
+            if (statsLabel) {
+                statsLabel.textContent = `${outstandingTotalBrands} brands / ฿5.23M total`;
+            }
+        }
+
+        const _stf = document.getElementById('serviceTypeFilter');
+        const _mf = document.getElementById('monthFilter');
+        if (_stf) _stf.addEventListener('change', (e) => {
+            const monthFilter = _mf ? _mf.value : 'all';
+            updateCollectionStats(e.target.value, monthFilter);
+        });
+        if (_mf) _mf.addEventListener('change', (e) => {
+            const serviceFilter = _stf ? _stf.value : 'all';
+            updateCollectionStats(serviceFilter, e.target.value);
+            renderUnpaidBrandsTable(e.target.value);
+        });
+
+        // ========== INITIALIZE ==========
+        window.addEventListener('load', () => {
+            console.log('Page loaded, initializing...');
+            
+            // Initialize collection tab
+            initCollectionTab();
+            
+            // Add event listeners for Combined View filters
+            const serviceFilter = document.getElementById('serviceTypeFilter');
+            const monthFilter = document.getElementById('monthFilter');
+            
+            if (serviceFilter) {
+                serviceFilter.addEventListener('change', () => {
+                    updateCollectionStats(serviceFilter.value, monthFilter ? monthFilter.value : 'all');
+                });
+            }
+            
+            if (monthFilter) {
+                monthFilter.addEventListener('change', () => {
+                    updateCollectionStats(serviceFilter ? serviceFilter.value : 'all', monthFilter.value);
+                });
+            }
+            
+            // Force populate service tables (backup)
+            setTimeout(() => {
+                const growthBody = document.getElementById('growthServiceBody');
+                if (growthBody && growthBody.innerHTML.trim() === '') {
+                    populateServiceTypeTables();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
