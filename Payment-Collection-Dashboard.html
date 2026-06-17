@@ -1199,7 +1199,7 @@
             document.getElementById(tabName + '-tab').classList.add('active');
             event.target.classList.add('active');
 
-            if (tabName === 'collection' && !charts.monthlyCollectionChart) {
+            if (tabName === 'collection' && !charts._collectionTabInitialized) {
                 setTimeout(initCollectionTab, 100);
             }
             if (tabName === 'weekly' && !charts.weeklyTrendChart) {
@@ -1909,6 +1909,8 @@
 
         // ========== INVOICE COLLECTION STATUS TAB ==========
         function initCollectionTab() {
+            if (charts._collectionTabInitialized) return; // prevent double init
+            charts._collectionTabInitialized = true;
             populateServiceTypeTables();
             updateCollectionStats('all');
             renderUnpaidBrandsTable('all'); // Initialize outstanding payments table
@@ -2197,13 +2199,7 @@
                 });
             }
             
-            // Force populate service tables (backup)
-            setTimeout(() => {
-                const growthBody = document.getElementById('growthServiceBody');
-                if (growthBody && growthBody.innerHTML.trim() === '') {
-                    populateServiceTypeTables();
-                }
-            }, 100);
+            // (service tables populated by initCollectionTab above)
         });
     </script>
 </body>
