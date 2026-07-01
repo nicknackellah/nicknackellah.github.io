@@ -581,6 +581,34 @@
                 <h3>💰 Invoice Send Out Volume</h3>
                 <canvas id="weeklyVolumeChart"></canvas>
             </div>
+
+            <div class="chart-card full-width" style="margin-bottom: 20px;">
+                <h3>🔍 Payment Timing Shift — Due Date Change Impact</h3>
+                <div style="font-size:12px;color:#64748b;margin-bottom:14px;">
+                    Due date moved from end-of-month to the 25th, starting with April invoices (due May 25). Chart shows what share of each month's cash-in landed in each day-of-month window — the peak clearly moved from day 28-31 to day 25.
+                </div>
+                <div class="stats-grid" style="margin-bottom:16px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Mar invoices (old rule, due Apr 30)</div>
+                        <div class="stat-value" style="font-size:22px;">66.0%</div>
+                        <div class="stat-change">Collected by due date</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Apr invoices (new rule, due May 25)</div>
+                        <div class="stat-value" style="font-size:22px;">51.2%</div>
+                        <div class="stat-change negative">Collected by due date</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">May invoices (new rule, due Jun 25)</div>
+                        <div class="stat-value" style="font-size:22px;">46.4%</div>
+                        <div class="stat-change negative">Collected by due date (still early — data as of Jun 27)</div>
+                    </div>
+                </div>
+                <canvas id="paymentTimingShiftChart"></canvas>
+                <div style="font-size:12px;color:#64748b;margin-top:10px;">
+                    Takeaway: brands are paying earlier in the month — the single biggest payment day moved from the 30th (April) to the 25th (May and June, two months in a row). But the on-time rate against the new, earlier due date hasn't caught up to the old baseline yet — expect this to keep improving as brands adjust; re-check in July.
+                </div>
+            </div>
         </div>
 
         <!-- Monthly Report Tab -->
@@ -978,6 +1006,15 @@
             'Jun 2026': 3550181.94
         };
 
+        // Payment Timing Shift analysis (Growth & Platform mgmt invoices)
+        // Due date change: end-of-month -> 25th, effective from April invoices (due May 25)
+        const paymentTimingBuckets = {
+            labels: ['Day 1-19', 'Day 20-24', 'Day 25', 'Day 26-27', 'Day 28-31'],
+            april: [41.5, 25.1, 0.4, 3.7, 29.4],
+            may: [56.2, 6.3, 14.8, 7.3, 15.4],
+            june: [51.5, 17.5, 21.2, 9.8, null]
+        };
+
         const thisWeekPayments = [
             {date: '05/06/2026', ref: 'IV-20260400043', contact: 'ไทยวีแกน Company Limited', amount: 91245.98, month: 'Apr 2026'},
             {date: '05/06/2026', ref: 'IV-20260400008', contact: 'อินโนเวทีฟ ฟู๊ด ทรัคส์ Company Limited', amount: 70475.81, month: 'Apr 2026'},
@@ -1357,8 +1394,8 @@
                 'Week 22 (25 - 31 May)': { prev: 'Week 18 (27 Apr - 3 May)', growth: +57.4 },
                 'Week 23 (2 - 8 Jun)': { prev: 'Week 18 (27 Apr - 3 May)', growth: -64.7 },
                 'Week 24 (8 - 14 Jun)': { prev: 'Week 19 (4 - 10 May)', growth: 9.3 },
-                'Week 25 (15 - 21 Jun)': { prev: 'Week 20 (11 - 17 May)', growth: null },
-                'Week 26 (22 - 28 Jun)': { prev: 'Week 21 (18 - 24 May)', growth: null },
+                'Week 25 (15 - 21 Jun)': { prev: 'Week 20 (11 - 17 May)', growth: +52.3 },
+                'Week 26 (22 - 28 Jun)': { prev: 'Week 21 (18 - 24 May)', growth: +39.4 },
             };
 
             charts.weeklyTrendChart = safeChart('weeklyTrendChart', {
@@ -1409,7 +1446,7 @@
                         data.datasets[0].data.forEach((val, i) => {
                             const week = weeklyTrendData[i].week;
                             const mom = weekMoM[week];
-                            if (!mom || val === 0) return;
+                            if (!mom || val === 0 || mom.growth === null || mom.growth === undefined) return;
                             const barX = x.getPixelForValue(i);
                             const barTop = y.getPixelForValue(val);
                             const arrow = mom.growth >= 0 ? '▲' : '▼';
@@ -1459,26 +1496,84 @@
                 }
             });
 
-            // Weekly Detail Table
+            // Weekly Detail Table (element removed from UI; null-guarded to avoid blocking later init code)
             const weeklyDetailBody = document.getElementById('weeklyDetailBody');
-            weeklyDetailBody.innerHTML = weeklyTrendData.map(w => {
-                let statusBadge = '';
-                if (w.collection_rate >= 95) statusBadge = '<span class="badge badge-green">Excellent</span>';
-                else if (w.collection_rate >= 85) statusBadge = '<span class="badge badge-blue">Good</span>';
-                else if (w.collection_rate >= 70) statusBadge = '<span class="badge badge-yellow">Fair</span>';
-                else statusBadge = '<span class="badge badge-red">Needs Attention</span>';
+            if (weeklyDetailBody) {
+                weeklyDetailBody.innerHTML = weeklyTrendData.map(w => {
+                    let statusBadge = '';
+                    if (w.collection_rate >= 95) statusBadge = '<span class="badge badge-green">Excellent</span>';
+                    else if (w.collection_rate >= 85) statusBadge = '<span class="badge badge-blue">Good</span>';
+                    else if (w.collection_rate >= 70) statusBadge = '<span class="badge badge-yellow">Fair</span>';
+                    else statusBadge = '<span class="badge badge-red">Needs Attention</span>';
 
-                return `<tr>
-                    <td><strong>${w.week}</strong></td>
-                    <td>${w.invoice_count}</td>
-                    <td style="color: #1a6641;">${w.paid_count}</td>
-                    <td>${formatCurrency(w.invoiced)}</td>
-                    <td style="color: #1a6641;">${formatCurrency(w.collected)}</td>
-                    <td style="color: #c44a1c;">${formatCurrency(w.pending)}</td>
-                    <td><strong>${w.collection_rate.toFixed(1)}%</strong></td>
-                    <td>${statusBadge}</td>
-                </tr>`;
-            }).join('');
+                    return `<tr>
+                        <td><strong>${w.week}</strong></td>
+                        <td>${w.invoice_count}</td>
+                        <td style="color: #1a6641;">${w.paid_count}</td>
+                        <td>${formatCurrency(w.invoiced)}</td>
+                        <td style="color: #1a6641;">${formatCurrency(w.collected)}</td>
+                        <td style="color: #c44a1c;">${formatCurrency(w.pending)}</td>
+                        <td><strong>${w.collection_rate.toFixed(1)}%</strong></td>
+                        <td>${statusBadge}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Payment Timing Shift Chart
+            charts.paymentTimingShiftChart = safeChart('paymentTimingShiftChart', {
+                type: 'bar',
+                data: {
+                    labels: paymentTimingBuckets.labels,
+                    datasets: [
+                        {
+                            label: 'April',
+                            data: paymentTimingBuckets.april,
+                            backgroundColor: 'rgba(43, 93, 159, 0.85)',
+                            borderColor: 'rgba(43, 93, 159, 1)',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'May',
+                            data: paymentTimingBuckets.may,
+                            backgroundColor: 'rgba(29, 158, 117, 0.85)',
+                            borderColor: 'rgba(29, 158, 117, 1)',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'June (thru 27th)',
+                            data: paymentTimingBuckets.june,
+                            backgroundColor: 'rgba(254, 135, 97, 0.85)',
+                            borderColor: 'rgba(254, 135, 97, 1)',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const val = context.parsed.y;
+                                    if (val === null || val === undefined) return context.dataset.label + ': no data yet';
+                                    return context.dataset.label + ': ' + val + '% of month cash-in';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: '% of month cash-in' },
+                            ticks: { callback: (v) => v + '%' }
+                        }
+                    }
+                }
+            });
         }
 
         // ========== MONTHLY REPORT TAB ==========
