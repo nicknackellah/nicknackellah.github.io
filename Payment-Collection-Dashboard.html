@@ -347,65 +347,35 @@
 
         <!-- This Week Update Section -->
         <div class="card" style="background: var(--ni-grad-energy); color: white; margin-bottom: 30px; border-top: none;">
-            <h2 style="color: white; margin-bottom: 20px;">🆕 Recent Payments (Jun 8-14, 2026)</h2>
+            <h2 style="color: white; margin-bottom: 20px;">🆕 Recent Payments (Jun 22-28, 2026)</h2>
             <div class="stats-grid">
                 <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
-                    <div class="stat-label" style="color: rgba(255,255,255,0.9);">Payments Received</div>
-                    <div class="stat-value" style="color: white;">30</div>
-                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">Jun 8-14, 2026</div>
-                </div>
-                <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
                     <div class="stat-label" style="color: rgba(255,255,255,0.9);">Total Cash Collected</div>
-                    <div class="stat-value" style="color: white;">฿636,546</div>
-                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">Jun 8-14, 2026</div>
+                    <div class="stat-value" style="color: white;">฿1,636,424</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">Week 26 (Jun 22-28)</div>
                 </div>
                 <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
                     <div class="stat-label" style="color: rgba(255,255,255,0.9);">Jun 2026 MTD Cash-In</div>
-                    <div class="stat-value" style="color: white;">฿1,026,940</div>
-                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">2 weeks in (30 payments)</div>
+                    <div class="stat-value" style="color: white;">฿3,550,182</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">All payments · 94 received</div>
                 </div>
                 <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">
                     <div class="stat-label" style="color: rgba(255,255,255,0.9);">May Invoice Collection</div>
-                    <div class="stat-value" style="color: white;">81%</div>
-                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">฿3.28M of ฿3.28M invoiced</div>
+                    <div class="stat-value" style="color: white;">51.7%</div>
+                    <div class="stat-change" style="color: rgba(255,255,255,0.8);">฿2.34M of ฿4.52M invoiced</div>
                 </div>
             </div>
             
             <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
                 <h4 style="color: white; margin-bottom: 10px;">💡 Quick Insights:</h4>
                 <ul style="color: rgba(255,255,255,0.9); margin: 0; padding-left: 20px;">
-                    <li>Jun MTD cash-in ฿1.03M from 30 payments across 2 weeks</li>
-                    <li>May invoice collection at 81% — fast payers already settled (73% of May base)</li>
-                    <li>Jun invoices (฿329K) fully collected by fast payers</li>
-                    <li>Week 24 (Jun 8-14) contributed ฿636,546 — +63% vs Week 23</li>
+                    <li>Jun MTD cash-in ฿3.55M (all services, 94 payments through Jun 28)</li>
+                    <li>Week 26 (Jun 22-28) contributed ฿1,636,424 · Week 25 (Jun 15-21) ฿886,818</li>
+                    <li>May invoice at 51.7% (Growth & Platform only) — ฿2.34M of ฿4.52M collected</li>
+                    <li>Apr invoice nearly closed at 97.2% (Growth & Platform only) — ฿108K remaining</li>
                 </ul>
             </div>
 
-            <div style="margin-top: 15px;">
-                <button onclick="toggleWeeklyDetails()" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
-                    📋 View All 30 Payments (Jun 8-14)
-                </button>
-                <div id="weeklyDetailsTable" style="display: none; margin-top: 15px; background: white; border-radius: 8px; padding: 20px;">
-                    <h4 style="color: var(--ni-navy); margin-bottom: 15px;">Payments Received: Jun 8-14, 2026</h4>
-                    <table style="width: 100%;">
-                        <thead>
-                            <tr style="background: var(--ni-surface2); color: var(--ni-navy);">
-                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--ni-border);">Date</th>
-                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--ni-border);">Invoice</th>
-                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--ni-border);">Brand (Thai)</th>
-                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--ni-border);">Contact/Brand</th>
-                                <th style="padding: 12px; text-align: right; border-bottom: 2px solid var(--ni-border);">Amount</th>
-                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid var(--ni-border);">Month</th>
-                            </tr>
-                        </thead>
-                        <tbody id="thisWeekPaymentsBody">
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 15px; padding: 15px; background: var(--ni-surface2); border-radius: 6px;">
-                        <strong style="color: var(--ni-navy);">Total: ฿636,546 from 30 payments (Jun 8-14, 2026)</strong>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="nav-tabs">
@@ -456,8 +426,8 @@
                         </div>
                         <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 2px solid #e2e8f0;">
                             <div style="font-size: 13px; color: var(--ni-text2); margin-bottom: 5px;">June 2026 <span style="font-size: 11px; color: #f6ad55;">● In Progress</span></div>
-                            <div style="font-size: 22px; font-weight: 700; color: var(--ni-blue);">฿1,026,940</div>
-                            <div style="font-size: 12px; color: var(--ni-teal); margin-top: 3px;"> · Through Jun 14</div>
+                            <div style="font-size: 22px; font-weight: 700; color: var(--ni-blue);">฿3,550,182</div>
+                            <div style="font-size: 12px; color: var(--ni-teal); margin-top: 3px;"> · Through Jun 28 (all services)</div>
                         </div>
                     </div>
                 </div>
@@ -537,38 +507,38 @@
                             <tr>
                                 <td><strong>Mar 2026</strong></td>
                                 <td>฿4,243,928</td>
-                                <td style="color: #1a6641;">฿4,133,574</td>
-                                <td style="color: #c44a1c;">฿110,354</td>
-                                <td><strong style="color: #1a6641">97.4%</strong></td>
+                                <td style="color: #1a6641;">฿4,150,746</td>
+                                <td style="color: #c44a1c;">฿93,182</td>
+                                <td><strong style="color: #1a6641">97.8%</strong></td>
                                 <td style="color: #1a6641">97.0%</td>
                                 <td style="color: #f6ad55">65.0%</td>
                                 <td style="background: #c2e4ee;">฿4,417,080</td>
-                                <td style="color: #1a6641; background: #c2e4ee;">฿4,302,224</td>
-                                <td style="color: #c44a1c; background: #c2e4ee;">฿114,856</td>
+                                <td style="color: #1a6641; background: #c2e4ee;">฿4,317,376</td>
+                                <td style="color: #c44a1c; background: #c2e4ee;">฿99,704</td>
                             </tr>
                             <tr>
                                 <td><strong>Apr 2026</strong></td>
                                 <td>฿3,900,688</td>
-                                <td style="color: #1a6641;">฿3,497,763</td>
-                                <td style="color: #c44a1c;">฿402,925</td>
-                                <td><strong style="color: #1a6641">89.7%</strong></td>
+                                <td style="color: #1a6641;">฿3,792,302</td>
+                                <td style="color: #c44a1c;">฿108,386</td>
+                                <td><strong style="color: #1a6641">97.2%</strong></td>
                                 <td style="color: #1a6641">89.0%</td>
                                 <td style="color: #1a6641">73.0%</td>
                                 <td style="background: #c2e4ee;">฿4,058,219</td>
-                                <td style="color: #1a6641; background: #c2e4ee;">฿3,639,022</td>
-                                <td style="color: #c44a1c; background: #c2e4ee;">฿419,197</td>
+                                <td style="color: #1a6641; background: #c2e4ee;">฿3,944,572</td>
+                                <td style="color: #c44a1c; background: #c2e4ee;">฿113,647</td>
                             </tr>
                             <tr style="background: #f0f6ff;">
                                 <td><strong>May 2026</strong></td>
                                 <td>฿4,523,438</td>
-                                <td style="color: #1a6641;">฿300,047</td>
-                                <td style="color: #c44a1c;">฿4,223,391</td>
-                                <td><strong style="color: #f6ad55">6.6%</strong></td>
+                                <td style="color: #1a6641;">฿2,337,695</td>
+                                <td style="color: #c44a1c;">฿2,185,743</td>
+                                <td><strong style="color: #f6ad55">51.7%</strong></td>
                                 <td style="color: #94a3b8">—</td>
-                                <td style="color: #f6ad55">6.6%</td>
+                                <td style="color: #f6ad55">51.7%</td>
                                 <td style="background: #c2e4ee;">฿4,707,352</td>
-                                <td style="color: #1a6641; background: #c2e4ee;">฿312,049</td>
-                                <td style="color: #c44a1c; background: #c2e4ee;">฿4,395,303</td>
+                                <td style="color: #1a6641; background: #c2e4ee;">฿2,431,666</td>
+                                <td style="color: #c44a1c; background: #c2e4ee;">฿2,275,686</td>
                             </tr>
                         </tbody>
                     </table>
@@ -740,13 +710,13 @@
         <div id="outstanding-tab" class="tab-content">
             <div style="margin-bottom: 20px;">
                 <h2 style="margin: 0 0 10px 0; color: var(--ni-blue);">📊 Outstanding Payments Dashboard</h2>
-                <p style="margin: 0; color: var(--ni-text2); font-size: 14px;">Live data from AR Aging Report - Updated May 25, 2026</p>
+                <p style="margin: 0; color: var(--ni-text2); font-size: 14px;">Live data from AR Aging Report - Updated Jun 29, 2026</p>
             </div>
             
             <!-- Embedded External Dashboard -->
             <div style="width: 100%; height: calc(100vh - 200px); min-height: 800px; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: white;">
                 <iframe 
-                    src="https://nicknackellah.github.io/-Outstanding-Payments-Dashboard/outstanding_payments_dashboard.html?v=may25" 
+                    src="https://nicknackellah.github.io/Outstanding-Payment-Dashboard/?v=jun29" 
                     style="width: 100%; height: 100%; border: none;"
                     title="Outstanding Payments Dashboard"
                     sandbox="allow-scripts allow-same-origin"
@@ -938,9 +908,9 @@
                 'Dec 2025': {total: 3087466.19, paid: 3064578.51, pending: 22887.68, cashin_total: 3211843, cashin_collected: 3187722, cashin_pending: 24120, collection_rate: 99.3, rate_45days: 89.0, rate_by_due: 68.5, pending_rate: 0.7, unpaid_brands: [{brand: "Grow Tea.studio (Khlong Tan Nuea)", amount: 12301.56, invoices: ["IV-20251200036"]}, {brand: "Grow Tea.studio (Sutthisan)", amount: 10586.12, invoices: ["IV-20251200039"]}]},
                 'Jan 2026': {total: 3446407.14, paid: 3425261.67, pending: 21145.47, cashin_total: 3587864, cashin_collected: 3565873, cashin_pending: 21991, collection_rate: 99.4, rate_45days: 87.8, rate_by_due: 55.2, pending_rate: 0.6, unpaid_brands: [{brand: "AGE Burgers", amount: 21145.47, invoices: ["IV-20260100006"]}]},
                 'Feb 2026': {total: 3303688.31, paid: 3231588.05, pending: 72100.26, cashin_total: 3439401, cashin_collected: 3364417, cashin_pending: 74984, collection_rate: 97.8, rate_45days: 96.2, rate_by_due: 73.5, pending_rate: 2.2, unpaid_brands: [{brand: "AGE Burgers", amount: 18983.90, invoices: ["IV-20260200006"]}, {brand: "Eggday (Asok)", amount: 53116.36, invoices: ["IV-20260200055"]}]},
-                'Mar 2026': {total: 4243927.61, paid: 4133573.75, pending: 110353.86, cashin_total: 4417080, cashin_collected: 4302224, cashin_pending: 114856, collection_rate: 97.4, rate_45days: 97.0, rate_by_due: 65.0, pending_rate: 2.6, unpaid_brands: [{brand: "AGE Burgers", amount: 20232.50, invoices: ["IV-20260300005"]}, {brand: "Eggday (Asok)", amount: 79471.87, invoices: ["IV-20260300052"]}, {brand: "Indus (Sukhumvit)", amount: 18374.25, invoices: ["IV-20260300059"]}]},
-                'Apr 2026': {total: 3900688.08, paid: 3497763.18, pending: 402924.90, cashin_total: 4058219, cashin_collected: 3639022, cashin_pending: 419197, collection_rate: 89.7, rate_45days: 89.0, rate_by_due: 73.0, pending_rate: 10.3, unpaid_brands: [{brand: "Outstanding brands (Apr)", amount: 402924.90, invoices: []}]},
-                'May 2026': {total: 4523438.39, paid: 300047.24, pending: 4223391.15, cashin_total: 4707352, cashin_collected: 312049, cashin_pending: 4395303, collection_rate: 6.6, rate_45days: 0, rate_by_due: 6.6, pending_rate: 93.4, unpaid_brands: [{brand: "Outstanding brands (May)", amount: 4223391.15, invoices: []}]},
+                'Mar 2026': {total: 4243927.61, paid: 4150745.95, pending: 93181.66, cashin_total: 4417080, cashin_collected: 4317376, cashin_pending: 99704, collection_rate: 97.8, rate_45days: 97.0, rate_by_due: 65.0, pending_rate: 2.2, unpaid_brands: [{brand: "AGE Burgers", amount: 20232.50, invoices: ["IV-20260300005"]}, {brand: "Eggday (Asok)", amount: 72949.16, invoices: ["IV-20260300052"]}]},
+                'Apr 2026': {total: 3900688.08, paid: 3792302.03, pending: 108386.05, cashin_total: 4058219, cashin_collected: 3944572, cashin_pending: 113647, collection_rate: 97.2, rate_45days: 89.0, rate_by_due: 73.0, pending_rate: 2.8, unpaid_brands: [{brand: "Outstanding brands (Apr)", amount: 108386.05, invoices: []}]},
+                'May 2026': {total: 4523438.39, paid: 2337694.94, pending: 2185743.45, cashin_total: 4707352, cashin_collected: 2431666, cashin_pending: 2275686, collection_rate: 51.7, rate_45days: 0, rate_by_due: 51.7, pending_rate: 48.3, unpaid_brands: [{brand: "Outstanding brands (May)", amount: 2185743.45, invoices: []}]},
                 'Jun 2026': {total: 3151620.43, paid: 3276622.04, pending: 0, cashin_total: 3278949, cashin_collected: 3276622, cashin_pending: 2327, collection_rate: 81.0, rate_45days: 81.0, rate_by_due: 81.0, pending_rate: 19.0, unpaid_brands: [{brand: "Remaining May invoices", amount: 444731.45, invoices: []}]}
             },
             'other': {
@@ -958,9 +928,9 @@
             'Dec 2025': {rate_all: 99.3, rate_45days: 0.0, rate_by_due: 35.9},
             'Jan 2026': {rate_all: 99.4, rate_45days: 87.3, rate_by_due: 55.4},
             'Feb 2026': {rate_all: 97.8, rate_45days: 96.2, rate_by_due: 73.5},
-            'Mar 2026': {rate_all: 97.4, rate_45days: 97.0, rate_by_due: 65.0},
-            'Apr 2026': {rate_all: 89.7, rate_45days: 89.0, rate_by_due: 73.0},
-            'May 2026': {rate_all: 6.6, rate_45days: 0, rate_by_due: 6.6},
+            'Mar 2026': {rate_all: 97.8, rate_45days: 97.0, rate_by_due: 65.0},
+            'Apr 2026': {rate_all: 97.2, rate_45days: 89.0, rate_by_due: 73.0},
+            'May 2026': {rate_all: 51.7, rate_45days: 0, rate_by_due: 51.7},
             'Jun 2026': {rate_all: 81.0, rate_45days: 81.0, rate_by_due: 81.0}
         };
 
@@ -993,7 +963,9 @@
             {week: 'Week 21 (18 - 24 May)', invoiced: 0, collected: 0, pending: 0, cashin: 1174151, collection_rate: 0, invoice_count: 0, paid_count: 0},
             {week: 'Week 22 (25 - 31 May)', invoiced: 0, collected: 0, pending: 0, cashin: 1736896, collection_rate: 0, invoice_count: 0, paid_count: 0},
             {week: 'Week 23 (2 - 8 Jun)', invoiced: 0, collected: 0, pending: 0, cashin: 390394, collection_rate: 0, invoice_count: 117, paid_count: 0},
-            {week: 'Week 24 (8 - 14 Jun)', invoiced: 0, collected: 0, pending: 0, cashin: 636546, collection_rate: 0, invoice_count: 0, paid_count: 0}
+            {week: 'Week 24 (8 - 14 Jun)', invoiced: 0, collected: 0, pending: 0, cashin: 636546, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 25 (15 - 21 Jun)', invoiced: 0, collected: 0, pending: 0, cashin: 886818, collection_rate: 0, invoice_count: 0, paid_count: 0},
+            {week: 'Week 26 (22 - 28 Jun)', invoiced: 0, collected: 0, pending: 0, cashin: 1636424, collection_rate: 0, invoice_count: 0, paid_count: 0}
         ];
 
         const monthlyCashIn = {
@@ -1003,7 +975,7 @@
             'Mar 2026': 4604046.00,
             'Apr 2026': 3819851.99,
             'May 2026': 4615040.68,
-            'Jun 2026': 1026939.80
+            'Jun 2026': 3550181.94
         };
 
         const thisWeekPayments = [
@@ -1114,53 +1086,6 @@
         let currentServiceFilter = 'all';
 
         let charts = {};
-
-        // ========== THIS WEEK UPDATE FUNCTIONS ==========
-        function toggleWeeklyDetails() {
-            const detailsDiv = document.getElementById('weeklyDetailsTable');
-            if (detailsDiv.style.display === 'none') {
-                detailsDiv.style.display = 'block';
-                populateThisWeekPayments();
-            } else {
-                detailsDiv.style.display = 'none';
-            }
-        }
-
-        function populateThisWeekPayments() {
-            const tbody = document.getElementById('thisWeekPaymentsBody');
-            if (!tbody) {
-                console.error('thisWeekPaymentsBody not found');
-                return;
-            }
-            
-            // Only skip if already populated with actual data (more than just whitespace)
-            if (tbody.innerHTML.trim() !== '' && tbody.querySelectorAll('tr').length > 0) {
-                return; // Already populated
-            }
-            
-            console.log('Populating', thisWeekPayments.length, 'payments');
-            
-            tbody.innerHTML = thisWeekPayments.map(p => {
-                let monthBadge = '';
-                if (p.month === 'Mar 2026') monthBadge = '<span class="badge badge-blue">Mar</span>';
-                else if (p.month === 'Apr 2026') monthBadge = '<span class="badge badge-green">Apr</span>';
-                else monthBadge = '<span class="badge badge-yellow">Other</span>';
-                
-                // Get English brand name from mapping
-                const englishBrand = invoiceToBrand[p.ref] || 'N/A';
-                
-                return `<tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px; color: var(--ni-text2);">${p.date}</td>
-                    <td style="padding: 12px; color: var(--ni-text2); font-family: monospace; font-size: 12px;">${p.ref}</td>
-                    <td style="padding: 12px; color: var(--ni-navy);">${p.contact}</td>
-                    <td style="padding: 12px; color: var(--ni-blue); font-weight: 500;">${englishBrand}</td>
-                    <td style="padding: 12px; text-align: right; color: #1a6641; font-weight: bold;">${formatCurrency(p.amount)}</td>
-                    <td style="padding: 12px; text-align: center;">${monthBadge}</td>
-                </tr>`;
-            }).join('');
-            
-            console.log('Populated', tbody.querySelectorAll('tr').length, 'rows');
-        }
 
         // ========== UTILITY FUNCTIONS ==========
         function formatCurrency(num) {
@@ -1432,6 +1357,8 @@
                 'Week 22 (25 - 31 May)': { prev: 'Week 18 (27 Apr - 3 May)', growth: +57.4 },
                 'Week 23 (2 - 8 Jun)': { prev: 'Week 18 (27 Apr - 3 May)', growth: -64.7 },
                 'Week 24 (8 - 14 Jun)': { prev: 'Week 19 (4 - 10 May)', growth: 9.3 },
+                'Week 25 (15 - 21 Jun)': { prev: 'Week 20 (11 - 17 May)', growth: null },
+                'Week 26 (22 - 28 Jun)': { prev: 'Week 21 (18 - 24 May)', growth: null },
             };
 
             charts.weeklyTrendChart = safeChart('weeklyTrendChart', {
