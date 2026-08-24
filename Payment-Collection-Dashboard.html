@@ -768,7 +768,7 @@
                     <div style="width:33.3%; background:#f59e0b;"></div>
                     <div style="width:14.7%; background:#ef4444;"></div>
                 </div>
-                <div class="bb-kpi-sub" style="margin-top:6px;">103 brands total · based on avg payment days</div>
+                <div class="bb-kpi-sub" style="margin-top:6px;">105 brands total · based on avg payment days</div>
             </div>
         </div>
 
@@ -1990,7 +1990,9 @@
             {name:"Mala Pa Molly",total:19197.60,avg_monthly:19197.60,payments:1,avg_days:24.0,min_days:24.0,max_days:24.0,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0,"Jun 2026":0,"Jul 2026":19197.60},predicted_jun:0,pred_date:"",pred_week:"",pred_range:"",paid_jun:true},
             {name:"Kam's Roast",total:60645.33,avg_monthly:14270.41,payments:2,avg_days:26.0,min_days:26.0,max_days:26.0,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0,"Jun 2026":0,"Jul 2026":60645.33},predicted_jun:0,pred_date:"",pred_week:"",pred_range:"",paid_jun:true},
             {name:"Stoke Fire&Wine",total:8312.65,avg_monthly:8312.65,payments:1,avg_days:19.0,min_days:19.0,max_days:19.0,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0,"Jun 2026":0,"Jul 2026":8312.65},predicted_jun:0,pred_date:"",pred_week:"",pred_range:"",paid_jun:true},
-            {name:"June' 26",total:8577.32,avg_monthly:8577.32,payments:1,avg_days:27.0,min_days:27.0,max_days:27.0,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0,"Jun 2026":0,"Jul 2026":8577.32},predicted_jun:0,pred_date:"",pred_week:"",pred_range:"",paid_jun:true}
+            {name:"June' 26",total:8577.32,avg_monthly:8577.32,payments:1,avg_days:27.0,min_days:27.0,max_days:27.0,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0,"Jun 2026":0,"Jul 2026":8577.32},predicted_jun:0,pred_date:"",pred_week:"",pred_range:"",paid_jun:true},
+            {name:"Frickin' Fried Chicken",total:21662.55,avg_monthly:7220.85,payments:3,avg_days:51.7,min_days:21,max_days:82,std_days:24.9,consistency:0.52,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":1405.75,"Jun 2026":9262.75,"Jul 2026":10994.05},predicted_jun:10994.05,pred_date:"",pred_week:"",pred_range:"",paid_jun:true},
+            {name:"Born to Dine",total:36116.64,avg_monthly:36116.64,payments:1,avg_days:17.0,min_days:17,max_days:17,std_days:0.0,consistency:1.0,monthly:{"Dec 2025":0,"Jan 2026":0,"Feb 2026":0,"Mar 2026":0,"Apr 2026":0,"May 2026":0,"Jun 2026":0,"Jul 2026":36116.64},predicted_jun:0,pred_date:"",pred_week:"",pred_range:"",paid_jun:true}
         ];
 
                 const bbMonths = ['Dec 2025','Jan 2026','Feb 2026','Mar 2026','Apr 2026','May 2026'];
@@ -2073,7 +2075,7 @@
 
         function initBehaviorTab() {
             const total = brandBehaviorData.reduce((s,b) => s+b.total, 0);
-            const netTotal = 33148800.15; // Dec 2025 - Aug 23, 2026, 103 brands. Added Week 38 (Aug 17-23) payments: D'ARK +34,176.67, Saigon Recipe +77,575.95, Apollo Duck +56,272.27, Nine Pastry +51,202.80, Kam's Roast +46,374.92, plus Born to Dine (Analog Food) new entry ฿36,116.64 in Jul 2026.
+            const netTotal = 33148800.15; // Dec 2025 - Aug 23, 2026, 105 brands. Added Week 38 (Aug 17-23) payments incl. Frickin' Fried Chicken (JR Hospitality) ฿21,662.55 (May–Jul invoices) and Born to Dine (Analog Food) ฿36,116.64 in Jul 2026.
             const avgDays = 34.0; // payment-count-weighted mean of avg_days across all 101 brands
 
             document.getElementById('bb-total').textContent = formatCurrency(netTotal);
