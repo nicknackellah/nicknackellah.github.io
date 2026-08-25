@@ -662,7 +662,7 @@
                 <div class="stats-grid" style="margin-bottom:16px;">
                     <div class="stat-card">
                         <div class="stat-label">Mar invoices (old rule, due Apr 30)</div>
-                        <div class="stat-value" style="font-size:22px;">65.2%</div>
+                        <div class="stat-value" style="font-size:22px;">64.8%</div>
                         <div class="stat-change">Collected by due date</div>
                     </div>
                     <div class="stat-card">
@@ -677,8 +677,8 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Jun invoices (new rule, due Jul 25)</div>
-                        <div class="stat-value" style="font-size:22px;">42.5%</div>
-                        <div class="stat-change negative">Collected by due date (64.2% within +5 days, data current through Jul 31)</div>
+                        <div class="stat-value" style="font-size:22px;">42.7%</div>
+                        <div class="stat-change negative">Collected by due date (64.6% within +5 days)</div>
                     </div>
                 </div>
                 <canvas id="paymentTimingShiftChart"></canvas>
@@ -1106,9 +1106,10 @@
 
         const paymentTimingBuckets = {
             labels: ['Day 1-19', 'Day 20-24', 'Day 25', 'Day 26-27', 'Day 28-31'],
-            april: [49.7, 5.4, 18.6, 7.9, 18.4],
-            may: [46.2, 15.0, 14.6, 7.1, 17.1],
-            june: [19.8, 28.5, 11.3, 15.1, 25.4]
+            april: [49.6, 5.4, 18.4, 7.9, 18.3],
+            may: [46.3, 14.9, 14.5, 7.1, 16.9],
+            june: [40.6, 20.6, 8.1, 10.8, 18.2],
+            july: [19.4, 4.5, 0.0, 0.0, 0.0]
         };
 
         const thisWeekPayments = [
@@ -1701,6 +1702,14 @@
                             data: paymentTimingBuckets.june,
                             backgroundColor: 'rgba(254, 135, 97, 0.85)',
                             borderColor: 'rgba(254, 135, 97, 1)',
+                            borderWidth: 2,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'July (in progress)',
+                            data: paymentTimingBuckets.july,
+                            backgroundColor: 'rgba(156, 106, 222, 0.85)',
+                            borderColor: 'rgba(156, 106, 222, 1)',
                             borderWidth: 2,
                             borderRadius: 4
                         }
