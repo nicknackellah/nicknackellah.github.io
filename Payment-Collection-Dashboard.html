@@ -611,6 +611,50 @@
                 <canvas id="weeklyTrendChart"></canvas>
             </div>
 
+            <!-- FORECAST-START -->
+            <style>
+            .fc-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+            .fc-card { background:var(--ni-surface2); border:1px solid var(--ni-border); border-radius:10px; padding:14px; }
+            .fc-card.now { border-color:var(--ni-orange); }
+            .fc-wk { font-size:11px; font-weight:700; color:var(--ni-text2); letter-spacing:.04em; text-transform:uppercase; }
+            .fc-val { font-size:22px; font-weight:800; color:var(--ni-blue); margin:4px 0 2px; }
+            .fc-sub { font-size:11px; color:var(--ni-text3); margin-bottom:8px; }
+            .fc-top { font-size:11.5px; color:var(--ni-text); line-height:1.6; }
+            .fc-top span { color:var(--ni-text2); float:right; }
+            .fc-extra { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:16px; }
+            .fc-extra div { border-radius:8px; padding:10px 12px; font-size:12px; color:var(--ni-text2); background:var(--ni-surface2); }
+            .fc-extra b { display:block; font-size:16px; color:var(--ni-text); }
+            .wl-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+            .wl-table th { text-align:left; font-size:11px; color:var(--ni-text2); text-transform:uppercase; letter-spacing:.04em; padding:8px; border-bottom:2px solid var(--ni-border); }
+            .wl-table td { padding:8px; border-bottom:1px solid var(--ni-border); vertical-align:top; }
+            .wl-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
+            .wl-pill { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
+            .wl-red { background:#fee2e2; color:#991b1b; } .wl-amber { background:#fef3c7; color:#854d0e; } .wl-grey { background:#e2e8f0; color:#334155; }
+            .wl-h { font-size:14px; font-weight:700; color:var(--ni-blue); margin:18px 0 6px; }
+            .wl-note { font-size:12px; color:var(--ni-text2); margin-bottom:8px; }
+            @media (max-width: 900px){ .fc-grid{grid-template-columns:repeat(2,minmax(0,1fr));} .fc-extra{grid-template-columns:1fr;} }
+            </style>
+            <div class="chart-card full-width" style="margin-bottom: 20px;">
+                <h3>🔮 Cash-in Forecast — Next 4 Weeks</h3>
+                <div class="wl-note" id="fcNote"></div>
+                <div class="fc-grid" id="fcCards"></div>
+                <div style="max-width: 1000px; margin: 0 auto;"><canvas id="forecastChart"></canvas></div>
+                <div class="fc-extra" id="fcExtra"></div>
+                <div class="wl-note" style="margin-top:12px;" id="fcBacktest"></div>
+            </div>
+            <div class="chart-card full-width" style="margin-bottom: 20px;">
+                <h3>🚩 Late vs Usual Pattern — Payment Watchlist</h3>
+                <div class="wl-note">Each brand is compared with its <strong>own</strong> payment habit (median days from invoice to payment over its last 6 paid invoices), not just the due date. Flagged when a brand is 5+ days past the date it normally pays.</div>
+                <div class="wl-h">🚩 Should have paid by now (5+ days past their usual date)</div>
+                <table class="wl-table" id="wlLate"></table>
+                <div class="wl-h">🆕 Never paid yet (no payment history — first invoice still open)</div>
+                <table class="wl-table" id="wlNever"></table>
+                <div class="wl-h">⏳ Older invoices still open but on their usual schedule (expected this week or next — slow payers and 7th/10th/15th exception brands)</div>
+                <table class="wl-table" id="wlHabit"></table>
+                <div class="wl-note" style="margin-top:10px;" id="wlChronic"></div>
+            </div>
+<!-- FORECAST-END -->
+
             <div class="chart-card full-width" style="margin-bottom: 20px;">
                 <h3>📆 Month Pace — Last 2 months vs This month (Cumulative Cash-in)</h3>
                 <div style="font-size:12px;color:#64748b;margin-bottom:14px;">
@@ -1881,7 +1925,67 @@ if (D.week_comparison) {
         }
 
         // ========== WEEKLY TREND TAB ==========
+        // FORECAST-JS-START
+        const forecastData = {"data_through": "2026-10-05", "current_week": 45, "weeks": [{"week": 45, "label": "W45 (5 Oct – 11 Oct)", "actual_to_date": 112243, "forecast": 694848, "count": 11, "top": [{"brand": "Pizza Mania", "amount": 169340, "date": "2026-10-10"}, {"brand": "Masu Maki & Sushi Bar", "amount": 94459, "date": "2026-10-06"}, {"brand": "Le Lapin Sandwich", "amount": 89958, "date": "2026-10-10"}, {"brand": "Cholos BKK", "amount": 81561, "date": "2026-10-07"}, {"brand": "Ezoya", "amount": 74833, "date": "2026-10-06"}, {"brand": "Nine Pastry", "amount": 61802, "date": "2026-10-10"}]}, {"week": 46, "label": "W46 (12 Oct – 18 Oct)", "actual_to_date": 0, "forecast": 445403, "count": 7, "top": [{"brand": "Breakfast Story", "amount": 203884, "date": "2026-10-16"}, {"brand": "Giglio Trattoria Fiorentina", "amount": 67607, "date": "2026-10-15"}, {"brand": "Pizza X", "amount": 60218, "date": "2026-10-12"}, {"brand": "Cheng Sim Ei", "amount": 50458, "date": "2026-10-12"}, {"brand": "Nonna Nella", "amount": 37693, "date": "2026-10-17"}, {"brand": "Born to Dine", "amount": 20800, "date": "2026-10-14"}]}, {"week": 47, "label": "W47 (19 Oct – 25 Oct)", "actual_to_date": 0, "forecast": 1996471, "count": 42, "top": [{"brand": "Easy Health", "amount": 414090, "date": "2026-10-20"}, {"brand": "Easy Burger", "amount": 246495, "date": "2026-10-25"}, {"brand": "Fit2GO", "amount": 241582, "date": "2026-10-25"}, {"brand": "Saigon Recipe", "amount": 90518, "date": "2026-10-22"}, {"brand": "Larder", "amount": 87975, "date": "2026-10-24"}, {"brand": "BIANCA Italian Restaurant", "amount": 82806, "date": "2026-10-25"}]}, {"week": 48, "label": "W48 (26 Oct – 1 Nov)", "actual_to_date": 0, "forecast": 1724380, "count": 40, "top": [{"brand": "Kumtsu & Aharn Tai", "amount": 164980, "date": "2026-10-26"}, {"brand": "Meat Up! & Kaprao Up", "amount": 133370, "date": "2026-10-30"}, {"brand": "Al Saray", "amount": 111641, "date": "2026-10-30"}, {"brand": "Bella Madre Pizza", "amount": 92805, "date": "2026-10-30"}, {"brand": "Panetti Pizza", "amount": 89376, "date": "2026-10-30"}, {"brand": "Hunter Poke", "amount": 68380, "date": "2026-10-29"}]}], "later": 798359, "history": [{"week": 39, "label": "W39", "actual": 1530430}, {"week": 40, "label": "W40", "actual": 1746879}, {"week": 41, "label": "W41", "actual": 537866}, {"week": 42, "label": "W42", "actual": 1032718}, {"week": 43, "label": "W43", "actual": 2376778}, {"week": 44, "label": "W44", "actual": 1075503}], "backtest": [{"week": 40, "label": "W40", "pred": 1291307, "actual": 1278539}, {"week": 41, "label": "W41", "pred": 790943, "actual": 537866}, {"week": 42, "label": "W42", "pred": 1084412, "actual": 1041151}, {"week": 43, "label": "W43", "pred": 2205025, "actual": 2381817}, {"week": 44, "label": "W44", "pred": 1189234, "actual": 1033163}], "late": [{"brand": "Elvis Suki", "invoice": "IV-20260700069", "month": "July", "amount": 45787, "usual_lag": 32.0, "paydays": [30, 30, 2, 2, 2, 2], "expected": "2026-09-01", "days_late": 34, "terminated": false}, {"brand": "Hey Coffee", "invoice": "IV-20260700092", "month": "July", "amount": 9596, "usual_lag": 49.0, "paydays": [3, 3, 3, 3], "expected": "2026-09-18", "days_late": 17, "terminated": false}, {"brand": "Hey Coffee", "invoice": "IV-20260700096", "month": "July", "amount": 20429, "usual_lag": 49.0, "paydays": [3, 3, 3, 3], "expected": "2026-09-18", "days_late": 17, "terminated": false}, {"brand": "Chu", "invoice": "IV-20260800068", "month": "August", "amount": 64081, "usual_lag": 23, "paydays": [29, 14, 23, 21, 25], "expected": "2026-09-23", "days_late": 12, "terminated": true}, {"brand": "Mala Pa Molly", "invoice": "IV-20260800089", "month": "August", "amount": 28265, "usual_lag": 26.5, "paydays": [28, 25], "expected": "2026-09-26", "days_late": 9, "terminated": false}, {"brand": "Vistro", "invoice": "IV-20260800013", "month": "August", "amount": 28232, "usual_lag": 28.5, "paydays": [31, 29, 25, 29, 27, 28], "expected": "2026-09-28", "days_late": 7, "terminated": false}, {"brand": "Indus", "invoice": "IV-20260800048", "month": "August", "amount": 18177, "usual_lag": 28.5, "paydays": [20, 15, 18, 25, 3, 1], "expected": "2026-09-28", "days_late": 7, "terminated": false}], "never_paid": [{"brand": "Fowlmouth", "invoice": "IV-20260800069", "month": "August", "amount": 125894, "usual_lag": 27, "paydays": [], "expected": "2026-09-27", "days_late": 8, "terminated": true}, {"brand": "Omu", "invoice": "IV-20260800101", "month": "August", "amount": 48112, "usual_lag": 27, "paydays": [], "expected": "2026-09-27", "days_late": 8, "terminated": false}, {"brand": "Kalamansi Kitchen", "invoice": "IV-20260800103", "month": "August", "amount": 26222, "usual_lag": 27, "paydays": [], "expected": "2026-09-27", "days_late": 8, "terminated": false}, {"brand": "Neua Neur Bkk", "invoice": "IV-20260800100", "month": "August", "amount": 20026, "usual_lag": 27, "paydays": [], "expected": "2026-09-27", "days_late": 8, "terminated": false}, {"brand": "Neua Neur Bkk", "invoice": "IV-20260800106", "month": "August", "amount": 11636, "usual_lag": 27, "paydays": [], "expected": "2026-09-27", "days_late": 8, "terminated": false}], "on_schedule_overdue": [{"brand": "The Missing Burro", "invoice": "IV-20260800017", "amount": 9336, "expected": "2026-10-06", "usual_lag": 36.0}, {"brand": "Ezoya", "invoice": "IV-20260800022", "amount": 74833, "expected": "2026-10-06", "usual_lag": 35.5}, {"brand": "Cholos BKK", "invoice": "IV-20260800001", "amount": 81561, "expected": "2026-10-07", "usual_lag": 37.0}, {"brand": "StrackYum", "invoice": "IV-20260800020", "amount": 30458, "expected": "2026-10-07", "usual_lag": 37.0}, {"brand": "Le Lapin Sandwich", "invoice": "IV-20260800042", "amount": 89958, "expected": "2026-10-10", "usual_lag": 40.5}, {"brand": "Pizza Mania", "invoice": "IV-20260800043", "amount": 169340, "expected": "2026-10-10", "usual_lag": 40.5}, {"brand": "Cheng Sim Ei", "invoice": "IV-20260800108", "amount": 50458, "expected": "2026-10-12", "usual_lag": 42}, {"brand": "Pizza X", "invoice": "IV-20260800111", "amount": 60218, "expected": "2026-10-12", "usual_lag": 42.0}], "chronic": [{"brand": "Eggday", "amount": 133776}, {"brand": "AGE Burgers", "amount": 60108}, {"brand": "Grow Tea.studio", "amount": 48766}, {"brand": "Mae Noo Ayng", "amount": 40000}], "late_total": 214567, "never_total": 231890, "chronic_total": 282651, "portfolio_lag": 27};
+        function initForecastSection() {
+            const F = forecastData, fmt = v => '฿' + Math.round(v).toLocaleString();
+            const dfmt = s => { const d = new Date(s + 'T00:00:00'); return d.getDate() + ' ' + d.toLocaleString('en-GB', {month: 'short'}); };
+            const thru = dfmt(F.data_through);
+            document.getElementById('fcNote').innerHTML = 'Based on cash in the sheet through <strong>' + thru + ' ' + F.data_through.slice(0,4) + '</strong>. Each unpaid Growth &amp; Platform invoice is expected on its invoice date + the brand\'s usual payment lag (portfolio median ' + F.portfolio_lag + ' days for brands with no history). Amounts are expected cash (incl. VAT, after WHT). Invoices older than 75 days are excluded.';
+            document.getElementById('fcCards').innerHTML = F.weeks.map((w, i) => {
+                const tot = w.forecast + (w.actual_to_date || 0);
+                const sub = i === 0 ? fmt(w.actual_to_date) + ' received so far + ' + fmt(w.forecast) + ' expected' : w.count + ' invoices expected';
+                return '<div class="fc-card' + (i === 0 ? ' now' : '') + '"><div class="fc-wk">' + w.label + (i === 0 ? ' · this week' : '') + '</div>' +
+                    '<div class="fc-val">' + fmt(tot) + '</div><div class="fc-sub">' + sub + '</div>' +
+                    '<div class="fc-top">' + w.top.slice(0, 5).map(t => t.brand + '<span>' + fmt(t.amount) + '</span>').join('<br>') + '</div></div>';
+            }).join('');
+            document.getElementById('fcExtra').innerHTML =
+                '<div><b>' + fmt(F.late_total + F.never_total) + '</b>Possible upside — late vs usual + never paid (watchlist below), not in the weekly forecast</div>' +
+                '<div><b>' + fmt(F.later) + '</b>Expected after the 4-week window (slow payers)</div>' +
+                '<div><b>' + fmt(F.chronic_total) + '</b>Old debt &gt;75 days — excluded (' + F.chronic.map(c => c.brand).join(', ') + ')</div>';
+            const bt = F.backtest, bp = bt.reduce((s, b) => s + b.pred, 0), ba = bt.reduce((s, b) => s + b.actual, 0);
+            document.getElementById('fcBacktest').innerHTML = 'Accuracy check (same method run on Aug 31 data for September): ' +
+                bt.map(b => b.label + ' forecast ' + fmt(b.pred) + ' vs actual ' + fmt(b.actual)).join(' · ') +
+                ' — 5-week total ' + fmt(bp) + ' vs ' + fmt(ba) + ' (' + ((bp - ba) / ba * 100 >= 0 ? '+' : '') + ((bp - ba) / ba * 100).toFixed(1) + '%). Single weeks can shift ±1 week.';
+            const labels = F.history.map(h => h.label).concat(F.weeks.map(w => w.label.split(' (')[0]));
+            const actual = F.history.map(h => h.actual).concat(F.weeks.map((w, i) => i === 0 ? w.actual_to_date : null));
+            const fcast = F.history.map(() => null).concat(F.weeks.map(w => w.forecast));
+            if (charts.forecastChart) { try { charts.forecastChart.destroy(); } catch (e) {} }
+            charts.forecastChart = safeChart('forecastChart', {
+                type: 'bar',
+                data: { labels, datasets: [
+                    { label: 'Actual cash-in', data: actual, backgroundColor: 'rgba(43, 93, 159, 0.85)', borderRadius: 4, stack: 's' },
+                    { label: 'Forecast', data: fcast, backgroundColor: 'rgba(254, 135, 97, 0.55)', borderColor: 'rgba(254, 135, 97, 1)', borderWidth: 1.5, borderDash: [4, 3], borderRadius: 4, stack: 's' }
+                ] },
+                options: { responsive: true, plugins: { legend: { position: 'top' }, datalabels: { display: false },
+                    tooltip: { callbacks: { label: c => c.parsed.y == null ? null : c.dataset.label + ': ' + fmt(c.parsed.y) } } },
+                    scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: v => fmt(v) } } } }
+            });
+            const row = (cells) => '<tr>' + cells.join('') + '</tr>';
+            const head = (cols) => '<tr>' + cols.map(c => '<th' + (c.startsWith('#') ? ' style="text-align:right"' : '') + '>' + c.replace('#', '') + '</th>').join('') + '</tr>';
+            const pd = a => a && a.length ? 'paid on day ' + a.join(', ') : 'no history';
+            document.getElementById('wlLate').innerHTML = head(['Brand', 'Invoice', '#Amount', 'Usual habit', 'Expected by', 'Status']) +
+                (F.late.length ? F.late.map(x => row([
+                    '<td><strong>' + x.brand + '</strong>' + (x.terminated ? ' <span class="wl-pill wl-grey">terminated</span>' : '') + '</td>',
+                    '<td>' + x.invoice + ' (' + x.month + ')</td>', '<td class="num">' + fmt(x.amount) + '</td>',
+                    '<td>~' + Math.round(x.usual_lag) + ' days after invoice · ' + pd(x.paydays) + '</td>',
+                    '<td>' + dfmt(x.expected) + '</td>',
+                    '<td><span class="wl-pill ' + (x.days_late >= 14 ? 'wl-red' : 'wl-amber') + '">' + x.days_late + ' days late</span></td>'])).join('') : '<tr><td colspan="6">None 🎉</td></tr>');
+            document.getElementById('wlNever').innerHTML = head(['Brand', 'Invoice', '#Amount', 'Overdue since']) +
+                (F.never_paid.length ? F.never_paid.map(x => row([
+                    '<td><strong>' + x.brand + '</strong>' + (x.terminated ? ' <span class="wl-pill wl-grey">terminated</span>' : '') + '</td>',
+                    '<td>' + x.invoice + ' (' + x.month + ')</td>', '<td class="num">' + fmt(x.amount) + '</td>',
+                    '<td><span class="wl-pill wl-amber">~' + x.days_late + ' days</span></td>'])).join('') : '<tr><td colspan="4">None</td></tr>');
+            document.getElementById('wlHabit').innerHTML = head(['Brand', 'Invoice', '#Amount', 'Usually pays', 'Expected']) +
+                (F.on_schedule_overdue.length ? F.on_schedule_overdue.map(x => row([
+                    '<td><strong>' + x.brand + '</strong></td>', '<td>' + x.invoice + '</td>', '<td class="num">' + fmt(x.amount) + '</td>',
+                    '<td>~' + Math.round(x.usual_lag) + ' days after invoice</td>', '<td>' + dfmt(x.expected) + '</td>'])).join('') : '<tr><td colspan="5">None</td></tr>');
+            document.getElementById('wlChronic').innerHTML = '<strong>Old debt &gt;75 days (not forecast):</strong> ' + F.chronic.map(c => c.brand + ' ' + fmt(c.amount)).join(' · ') + ' — total ' + fmt(F.chronic_total) + '.';
+        }
+// FORECAST-JS-END
+
         function initWeeklyTab() {
+            try { initForecastSection(); } catch (e) { console.error(e); }
             // Calculate stats
             const totalWeeks = weeklyTrendData.length;
             const totalCashin = weeklyTrendData.reduce((sum, w) => sum + w.cashin, 0);
