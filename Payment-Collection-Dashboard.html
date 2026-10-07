@@ -638,7 +638,7 @@
                 <h3>🔮 Cash-in Forecast — Next 4 Weeks</h3>
                 <div class="wl-note" id="fcNote"></div>
                 <div class="fc-grid" id="fcCards"></div>
-                <div style="max-width: 1000px; margin: 0 auto;"><canvas id="forecastChart"></canvas></div>
+                <div style="position: relative; width: 100%; height: 360px; min-width: 0; overflow: hidden;"><canvas id="forecastChart"></canvas></div>
                 <div class="fc-extra" id="fcExtra"></div>
                 <div class="wl-note" style="margin-top:12px;" id="fcBacktest"></div>
             </div>
@@ -1957,7 +1957,7 @@ if (D.week_comparison) {
                     { label: 'Actual cash-in', data: actual, backgroundColor: 'rgba(43, 93, 159, 0.85)', borderRadius: 4, stack: 's' },
                     { label: 'Forecast', data: fcast, backgroundColor: 'rgba(254, 135, 97, 0.55)', borderColor: 'rgba(254, 135, 97, 1)', borderWidth: 1.5, borderDash: [4, 3], borderRadius: 4, stack: 's' }
                 ] },
-                options: { responsive: true, plugins: { legend: { position: 'top' }, datalabels: { display: false },
+                options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { position: 'top' }, datalabels: { display: false },
                     tooltip: { callbacks: { label: c => c.parsed.y == null ? null : c.dataset.label + ': ' + fmt(c.parsed.y) } } },
                     scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: v => fmt(v) } } } }
             });
